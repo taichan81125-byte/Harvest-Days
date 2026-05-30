@@ -48,7 +48,12 @@ function advance_time(_hours) {
         if (_rain_chance < 30) is_raining = true; else is_raining = false;
         
         with (obj_dirt) {
-            if (obj_game_manager.is_raining == true) is_watered = true; else is_watered = false; 
+            if (obj_game_manager.is_raining == true) {
+                is_watered = true;
+            } else {
+                // Chỉ làm khô đất nếu chưa trồng cây
+                if (plant_stage == 0) is_watered = false; 
+            }
             
             // Sâu bệnh ĐÃ ĐƯỢC CHUYỂN XUỐNG CUỐI HÀM để không bị cộng dồn thời gian ngủ
             
@@ -76,11 +81,18 @@ function advance_time(_hours) {
             // Cỏ dại không làm ngừng lớn, nhưng sâu bệnh thì CÓ
             if (is_watered == true && is_infected == false) {
                 growth_timer += _frames_passed;
-                var _current_max = 7200; // 24 tiếng
-                while (growth_timer >= _current_max && plant_stage < 3) {
+                while (growth_timer >= growth_max && plant_stage < 3) {
                     plant_stage += 1;
-                    growth_timer -= _current_max;
+                    growth_timer -= growth_max;
                     rot_timer = 0;
+                    
+                    if (obj_game_manager.is_raining) {
+                        is_watered = true;
+                    } else {
+                        is_watered = false;
+                        growth_timer = 0; // Dừng lại vì hết nước cho giai đoạn sau
+                        break;
+                    }
                 }
             } 
             
@@ -198,7 +210,7 @@ if (file_exists(_file_name)) {
     ini_open(_file_name);
 
     owner_name = ini_read_string("Info", "owner_name", "Người chơi mới");
-    obj_player.coins = ini_read_real("Player", "coins", 50);
+    obj_player.coins = ini_read_real("Player", "coins", 100);
     obj_player.hunger = ini_read_real("Player", "hunger", 100);
     obj_player.hp = ini_read_real("Player", "hp", 3);
 

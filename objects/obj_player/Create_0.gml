@@ -8,7 +8,7 @@ local_frame = 0;    // Biến đếm khung hình bước chân cho nhân vật
 action_timer = 0;   // Biến đếm thời gian vung công cụ (0 thì cầm tĩnh, > 0 thì vung)
 
 // --- HỆ THỐNG TÚI ĐỒ VÀ KINH TẾ ---
-coins = 50;         // Số tiền khởi nghiệp
+coins = 100;         // Số tiền khởi nghiệp
 selected_slot = 0;  // Ô túi đồ đang được chọn (từ 0 đến 9)
 item_popup_timer = 0; // Bộ đếm thời gian hiển thị tên vật phẩm khi đổi ô
 

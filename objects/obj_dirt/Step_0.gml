@@ -5,14 +5,12 @@ if (plant_stage > 0) {
         if (is_watered == true && is_infected == false) {
             growth_timer += 1;
             
-            // Mỗi giai đoạn cần đúng 1 ngày (24 giờ) = 24 * 60 * 5 = 7200 frames
-            var _current_max = 7200;
-            
             // Đủ thời gian -> Cây lớn lên 1 cấp
-            if (growth_timer >= _current_max) {
+            if (growth_timer >= growth_max) {
                 plant_stage += 1;
                 growth_timer = 0; // Reset lại đồng hồ lớn
                 rot_timer = 0;    // Reset lại đồng hồ héo
+                is_watered = false; // Tiêu hao nước cho giai đoạn sau
             }
         }
         

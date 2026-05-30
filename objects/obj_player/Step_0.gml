@@ -43,8 +43,18 @@ if (_is_ui_open == false) {
         hunger = 50; 
         hp = 3;
         
-        // Qua ngày mới luôn
-        obj_game_manager.advance_time(6);
+        // Qua ngày mới (chạy thẳng tới 6h sáng hôm sau)
+        var _cur_h = obj_game_manager.game_hour;
+        var _hours_diff = 0;
+        if (_cur_h >= 6) _hours_diff = 24 - _cur_h + 6;
+        else _hours_diff = 6 - _cur_h;
+        
+        var _minutes_diff = -obj_game_manager.game_minute;
+        var _total_hours_passed = _hours_diff + (_minutes_diff / 60);
+        
+        obj_game_manager.game_minute = 0;
+        obj_game_manager.advance_time(_total_hours_passed);
+        obj_game_manager.game_hour = 6;
         
         // --- TỰ ĐỘNG LƯU GAME SAU KHI NGẤT XỈU VÀO ĐÚNG SLOT ĐANG CHƠI ---
         obj_game_manager.save_game(global.current_save_file, global.player_name);
@@ -235,14 +245,28 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
         if (_target_npc != noone) obj_game_manager.show_dialogue = true;
         if (_target_shop != noone) obj_game_manager.show_shop = true;
         
-        // NHẬN HẠT GIỐNG VÀ CÔNG CỤ
         if (_target_table != noone) {
             if (_target_table.has_tools == true) {
-                inventory[0] = 0; inventory_count[0] = 1; 
-                inventory[1] = 1; inventory_count[1] = 1; 
-                inventory[2] = 2; inventory_count[2] = 6; 
+                var _items_to_give = [[0, 1], [1, 1], [2, 6]];
                 
-                for(var t=3; t<10; t++) { inventory[t] = -1; inventory_count[t] = 0; }
+                for (var i = 0; i < 3; i++) {
+                    var _id = _items_to_give[i][0];
+                    var _amt = _items_to_give[i][1];
+                    var _found = -1;
+                    var _empty = -1;
+                    
+                    for (var k = 0; k < 10; k++) {
+                        if (inventory[k] == _id) { _found = k; break; }
+                        if (inventory[k] == -1 && _empty == -1) { _empty = k; }
+                    }
+                    
+                    if (_found != -1) {
+                        inventory_count[_found] += _amt;
+                    } else if (_empty != -1) {
+                        inventory[_empty] = _id;
+                        inventory_count[_empty] = _amt;
+                    }
+                }
                 
                 _target_table.has_tools = false;
             }
@@ -384,8 +408,8 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
                         _target_dirt.plant_stage = 1; 
                         _target_dirt.plant_type = _current_item; // NHỚ LOẠI CÂY
                         
-                        if (_current_item == 2) _target_dirt.growth_max = 600; 
-                        else _target_dirt.growth_max = 1200;                   
+                        if (_current_item == 2) _target_dirt.growth_max = 1800; // 6 tiếng (300 frames * 6)
+                        else _target_dirt.growth_max = 3600; // Ngô 12 tiếng hoặc tuỳ ý
                         
                         inventory_count[selected_slot] -= 1;
                         if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
