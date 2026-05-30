@@ -1,0 +1,1 @@
+has_tools = true; // Bàn đang có đồ
