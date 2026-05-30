@@ -10,8 +10,8 @@
   "name":"obj_dirt",
   "overriddenProperties":[],
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Environment",
+    "path":"folders/Objects/Environment.yy",
   },
   "parentObjectId":null,
   "persistent":false,

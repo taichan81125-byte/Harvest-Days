@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSprite":"v2",
   "%Name":"spr_table",
   "bboxMode":0,
@@ -160,8 +160,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Environment",
+    "path":"folders/Sprites/Environment.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

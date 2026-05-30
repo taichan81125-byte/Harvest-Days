@@ -34,50 +34,65 @@ if (has_weed == true) {
 // ========================================================
 // 4. VẼ THANH TIẾN ĐỘ THỜI GIAN (UI TRỰC QUAN TRÊN ĐẦU CÂY)
 // ========================================================
-var _px = x + 12; var _py = y - 10; var _bar_w = 40; var _bar_h = 6;
 
-// ĐÃ SỬA: Ưu tiên cảnh báo "CỎ DẠI" hiển thị lên trên cùng, kể cả khi chưa có cây
-if (has_weed == true) {
-    draw_set_color(c_black); draw_rectangle(_px, _py, _px + _bar_w, _py + _bar_h, false);
-    draw_set_color(c_red); draw_rectangle(_px, _py, _px + _bar_w, _py + _bar_h, false);
+if (plant_stage == 1 || plant_stage == 2) {
+    var _px = x + 32; 
+    var _py = y - 10;
     
-    draw_set_color(c_red); draw_set_halign(fa_center);
-    draw_text_transformed(x + 32, y - 25, "CỎ DẠI!", 0.8, 0.8, 0);
-    draw_set_halign(fa_left);
-}
-else if (plant_stage == 1 || plant_stage == 2) {
+    // Thu bé khung thời gian (ví dụ 64px, tỷ lệ 64/450)
+    var _scale = 64 / 450; 
+    
+    var _bx_left = sprite_get_bbox_left(spr_khung_thoi_gian);
+    var _bx_right = sprite_get_bbox_right(spr_khung_thoi_gian);
+    var _bx_top = sprite_get_bbox_top(spr_khung_thoi_gian);
+    var _bx_bottom = sprite_get_bbox_bottom(spr_khung_thoi_gian);
+    
+    var _inner_w = (_bx_right - _bx_left) - 8;
+    var _inner_h = (_bx_bottom - _bx_top) - 8;
+    
+    // Tọa độ đặt khung sao cho căn giữa gốc cây
+    _px = (x + 32) - (sprite_get_width(spr_khung_thoi_gian) * _scale / 2);
+    _py = y - 30; // Đẩy thanh thời gian lên cao một chút theo yêu cầu
+    
+    var _bar_x = _px + (_bx_left + 4) * _scale;
+    var _bar_y = _py + (_bx_top + 4) * _scale;
+    var _bar_w_scaled = _inner_w * _scale;
+    var _bar_h_scaled = _inner_h * _scale;
+    
     if (is_watered == true && is_infected == false) {
-        // Đang phát triển -> Vẽ thanh màu Xanh Lá và đếm ngược Số Giây
-        draw_set_color(c_black); draw_rectangle(_px, _py, _px + _bar_w, _py + _bar_h, false);
-        var _percent = growth_timer / growth_max;
-        draw_set_color(c_lime); draw_rectangle(_px, _py, _px + (_bar_w * _percent), _py + _bar_h, false);
+        var _percent = growth_timer / 7200; 
+        if (_percent > 1) _percent = 1;
         
-        var _sec = ceil((growth_max - growth_timer) / 60);
-        draw_set_color(c_white); draw_set_halign(fa_center);
-        draw_text_transformed(x + 32, y - 25, string(_sec) + "s", 0.7, 0.7, 0); // Ví dụ: 5s
-        draw_set_halign(fa_left);
+        draw_set_color(c_lime); 
+        draw_rectangle(_bar_x, _bar_y, _bar_x + (_bar_w_scaled * _percent), _bar_y + _bar_h_scaled, false);
+        
+        draw_sprite_ext(spr_khung_thoi_gian, 0, _px, _py, _scale, _scale, 0, c_white, 1);
     }
     else if (is_infected == true) {
-        // Bị bệnh -> Vẽ thanh đếm ngược màu Đỏ đến lúc Chết
-        draw_set_color(c_black); draw_rectangle(_px, _py, _px + _bar_w, _py + _bar_h, false);
-        var _percent = rot_timer / rot_max;
-        draw_set_color(c_red); draw_rectangle(_px, _py, _px + (_bar_w * _percent), _py + _bar_h, false);
+        var _percent = rot_timer / 3600; 
+        if (_percent > 1) _percent = 1;
+        
+        draw_set_color(c_red); 
+        draw_rectangle(_bar_x, _bar_y, _bar_x + (_bar_w_scaled * _percent), _bar_y + _bar_h_scaled, false);
+        
+        draw_sprite_ext(spr_khung_thoi_gian, 0, _px, _py, _scale, _scale, 0, c_white, 1);
         
         draw_set_color(c_red); draw_set_halign(fa_center);
-        draw_text_transformed(x + 32, y - 25, "BỆNH!", 0.8, 0.8, 0);
+        draw_text_transformed(x + 32, _py - 15, "BỆNH!", 0.8, 0.8, 0);
         draw_set_halign(fa_left);
     }
     else if (is_watered == false) {
-        // Thiếu nước
+        draw_sprite_ext(spr_khung_thoi_gian, 0, _px, _py, _scale, _scale, 0, c_white, 1);
+        
         draw_set_color(c_aqua); draw_set_halign(fa_center);
-        draw_text_transformed(x + 32, y - 25, "Cần Nước", 0.7, 0.7, 0);
+        draw_text_transformed(x + 32, _py - 15, "Cần Nước", 0.7, 0.7, 0);
         draw_set_halign(fa_left);
     }
 }
-else if (plant_stage == 3) {
-    // Cây đã chín -> Vẽ thanh hẹp màu Đỏ đếm thời gian Hỏng
-    var _px2 = x + 12; var _py2 = y - 10; var _bar_w2 = 40; var _bar_h2 = 4;
-    draw_set_color(c_black); draw_rectangle(_px2, _py2, _px2 + _bar_w2, _py2 + _bar_h2, false);
-    var _percent = rot_timer / rot_max;
-    draw_set_color(c_red); draw_rectangle(_px2, _py2, _px2 + (_bar_w2 * _percent), _py2 + _bar_h2, false);
+
+// Cảnh báo Cỏ dại được vẽ độc lập, không làm mất thanh tiến độ
+if (has_weed == true) {
+    draw_set_color(c_red); draw_set_halign(fa_center);
+    draw_text_transformed(x + 32, y - 35, "CỎ DẠI!", 0.8, 0.8, 0);
+    draw_set_halign(fa_left);
 }

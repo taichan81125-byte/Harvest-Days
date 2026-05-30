@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSprite":"v2",
   "%Name":"spr_npc_moc",
   "bboxMode":0,
@@ -26,8 +26,8 @@
   "nineSlice":null,
   "origin":4,
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Characters",
+    "path":"folders/Sprites/Characters.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

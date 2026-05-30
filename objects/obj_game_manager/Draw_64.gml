@@ -1,11 +1,22 @@
 draw_set_font(fnt_vietnamese);
 
+// ==========================================
+// HIỆU ỨNG ÁNH SÁNG NGÀY/ĐÊM (VẼ TRƯỚC TIÊN ĐỂ KHÔNG ĐÈ LÊN UI)
+// ==========================================
+if (room == rm_farm && day_overlay_alpha > 0) {
+    draw_set_color(day_overlay_color);
+    draw_set_alpha(day_overlay_alpha);
+    // Hardcode kích thước GUI là 1280x720 cho chắc chắn
+    draw_rectangle(0, 0, 1280, 720, false);
+    draw_set_alpha(1.0);
+}
 if (instance_exists(obj_player)) {
 draw_set_color(c_yellow);
 draw_text(20, 20, "Tiền (Coins): " + string(obj_player.coins));
 
 if (room == rm_farm) {
-    var _ui_right_x = 1000; 
+    // Kéo các UI như tim và thức ăn sang trái một chút (về tọa độ 950) để nhường chỗ cho Đồng hồ
+    var _ui_right_x = 950; 
     
     for (var i = 0; i < 3; i++) {
         if (i < obj_player.hp) draw_sprite(spr_heart_full, 0, _ui_right_x + (i * 36), 20); 
@@ -20,6 +31,30 @@ if (room == rm_farm) {
 
     draw_sprite(spr_icon_gear, 0, 1180, 20);
 
+    // ==========================================
+    // VẼ ĐỒNG HỒ VÀ NGÀY
+    // ==========================================
+    var _clock_str = string(game_hour) + ":" + (game_minute < 10 ? "0" : "") + string(game_minute);
+    
+    // Đặt đồng hồ ở giữa trái tim (1022) và nút cài đặt (1180), nên _cx tầm 1100
+    var _cx = 1100;
+    var _cy = 50;
+    var _clock_scale = 160 / 450; // Cho đồng hồ to hơn (đường kính tầm 160px)
+    
+    draw_sprite_ext(spr_mat_dong_ho, 0, _cx, _cy, _clock_scale, _clock_scale, 0, c_white, 1);
+    
+    var _time_decimal = game_hour + (game_minute / 60);
+    var _angle = 90 - ((_time_decimal - 6) / 24) * 360;
+    
+    draw_sprite_ext(spr_kim_dong_ho, 0, _cx, _cy, _clock_scale, _clock_scale, _angle, c_white, 1);
+
+    // Text Ngày và Giờ (Cắt xa nhau ra một chút)
+    draw_set_color(c_white);
+    draw_set_halign(fa_center);
+    draw_text(_cx, _cy + 95, "Ngày " + string(day_count));
+    draw_set_color(c_yellow);
+    draw_text(_cx, _cy + 120, _clock_str);
+    draw_set_halign(fa_left);
     var _start_x = 340; var _y = 650;       
     
     for(var j = 0; j < 10; j++) {

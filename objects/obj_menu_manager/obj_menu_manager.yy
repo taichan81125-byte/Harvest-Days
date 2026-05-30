@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMObject":"",
   "%Name":"obj_menu_manager",
   "eventList":[
@@ -10,8 +10,8 @@
   "name":"obj_menu_manager",
   "overriddenProperties":[],
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Managers",
+    "path":"folders/Objects/Managers.yy",
   },
   "parentObjectId":null,
   "persistent":false,

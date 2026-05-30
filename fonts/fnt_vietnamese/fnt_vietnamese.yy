@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMFont":"",
   "%Name":"fnt_vietnamese",
   "AntiAlias":1,
@@ -342,8 +342,8 @@
   "maintainGms1Font":false,
   "name":"fnt_vietnamese",
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Fonts",
+    "path":"folders/Fonts.yy",
   },
   "pointRounding":0,
   "ranges":[

@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMObject":"",
   "%Name":"obj_npc_moc",
   "eventList":[],
@@ -6,8 +6,8 @@
   "name":"obj_npc_moc",
   "overriddenProperties":[],
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Characters",
+    "path":"folders/Objects/Characters.yy",
   },
   "parentObjectId":null,
   "persistent":false,

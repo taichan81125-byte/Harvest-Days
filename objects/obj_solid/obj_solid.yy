@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMObject":"",
   "%Name":"obj_solid",
   "eventList":[],
@@ -6,8 +6,8 @@
   "name":"obj_solid",
   "overriddenProperties":[],
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Environment",
+    "path":"folders/Objects/Environment.yy",
   },
   "parentObjectId":null,
   "persistent":false,

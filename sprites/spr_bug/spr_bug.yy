@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSprite":"v2",
   "%Name":"spr_bug",
   "bboxMode":0,
@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":4,
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Crops",
+    "path":"folders/Sprites/Crops.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

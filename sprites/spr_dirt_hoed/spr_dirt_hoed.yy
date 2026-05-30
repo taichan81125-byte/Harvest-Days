@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSprite":"v2",
   "%Name":"spr_dirt_hoed",
   "bboxMode":0,
@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Dirt",
+    "path":"folders/Sprites/Dirt.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

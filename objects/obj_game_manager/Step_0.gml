@@ -1,3 +1,56 @@
+// ==========================================
+// CẬP NHẬT ĐỒNG HỒ SINH HỌC & HIỆU ỨNG ÁNH SÁNG
+// ==========================================
+if (is_paused == false && room == rm_farm) {
+    time_ticker += 1;
+    
+    if (time_ticker >= frames_per_game_minute) {
+        time_ticker = 0;
+        game_minute += 1;
+        
+        if (game_minute >= 60) {
+            game_minute = 0;
+            game_hour += 1;
+            
+            if (game_hour >= 24) {
+                game_hour = 0;
+            }
+        }
+    }
+    
+    // TÍNH TOÁN HIỆU ỨNG ÁNH SÁNG THEO GIỜ
+    var _time_decimal = game_hour + (game_minute / 60);
+    
+    if (_time_decimal >= 6 && _time_decimal < 12) {
+        // Buổi sáng: Sáng hoàn toàn
+        day_overlay_alpha = 0;
+    } 
+    else if (_time_decimal >= 12 && _time_decimal < 18) {
+        // Buổi chiều: Vàng nhạt tăng dần
+        day_overlay_color = c_orange;
+        // Từ 12h (alpha 0) đến 18h (alpha 0.15)
+        day_overlay_alpha = ((_time_decimal - 12) / 6) * 0.15;
+    }
+    else if (_time_decimal >= 18 && _time_decimal < 22) {
+        // Buổi tối: Cam sang Tím tối dần
+        // 18h (alpha 0.15) đến 22h (alpha 0.6)
+        var _progress = (_time_decimal - 18) / 4;
+        day_overlay_color = merge_color(c_orange, c_navy, _progress);
+        day_overlay_alpha = 0.15 + (_progress * 0.45);
+    }
+    else if (_time_decimal >= 22 || _time_decimal < 2) {
+        // Ban đêm: Xanh đậm
+        day_overlay_color = c_navy;
+        day_overlay_alpha = 0.6;
+    }
+    else if (_time_decimal >= 2 && _time_decimal < 6) {
+        // Bình minh: Sáng dần lên
+        day_overlay_color = c_navy;
+        // 2h (alpha 0.6) đến 6h (alpha 0)
+        day_overlay_alpha = 0.6 - (((_time_decimal - 2) / 4) * 0.6);
+    }
+}
+
 if (is_raining == true) {
 effect_create_above(ef_rain, 0, 0, 1, c_silver);
 }

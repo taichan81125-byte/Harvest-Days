@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMRoom":"v1",
   "%Name":"rm_farm",
   "creationCodeFile":"",
@@ -104,8 +104,8 @@
   ],
   "name":"rm_farm",
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Rooms",
+    "path":"folders/Rooms.yy",
   },
   "parentRoom":null,
   "physicsSettings":{

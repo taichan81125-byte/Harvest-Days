@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSound":"v2",
   "%Name":"snd_coin",
   "audioGroupId":{
@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"snd_coin",
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Sounds",
+    "path":"folders/Sounds.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

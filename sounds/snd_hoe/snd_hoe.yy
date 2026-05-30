@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSound":"v2",
   "%Name":"snd_hoe",
   "audioGroupId":{
@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"snd_hoe",
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Sounds",
+    "path":"folders/Sounds.yy",
   },
   "preload":false,
   "resourceType":"GMSound",

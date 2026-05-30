@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMRoom":"v1",
   "%Name":"rm_menu",
   "creationCodeFile":"",
@@ -17,8 +17,8 @@
   ],
   "name":"rm_menu",
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Rooms",
+    "path":"folders/Rooms.yy",
   },
   "parentRoom":null,
   "physicsSettings":{

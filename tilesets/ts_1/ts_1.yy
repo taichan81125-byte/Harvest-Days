@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMTileSet":"v1",
   "%Name":"ts_1",
   "autoTileSets":[],
@@ -12,8 +12,8 @@
   "out_tilehborder":2,
   "out_tilevborder":2,
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Tilesets",
+    "path":"folders/Tilesets.yy",
   },
   "resourceType":"GMTileSet",
   "resourceVersion":"2.0",

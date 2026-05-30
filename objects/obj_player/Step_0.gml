@@ -6,8 +6,13 @@ if (_is_ui_open == false) {
     // ==========================================
     // HỆ THỐNG SINH TỒN (TRỪ ĐÓI, MẤT MÁU, NGẤT XỈU)
     // ==========================================
-    // 1. Trừ thức ăn theo thời gian (Trừ rất chậm)
-    hunger -= 0.01; 
+    // 1. Trừ thức ăn theo thời gian
+    // Ban đêm (từ 20:00 đến 6:00 sáng) thức ăn giảm nhanh gấp 3 lần để ép người chơi đi ngủ
+    var _hunger_drain = 0.01;
+    if (obj_game_manager.game_hour >= 20 || obj_game_manager.game_hour < 6) {
+        _hunger_drain = 0.03;
+    }
+    hunger -= _hunger_drain; 
     if (hunger < 0) hunger = 0;
 
     // 2. Chậm lại nếu quá đói
@@ -39,31 +44,7 @@ if (_is_ui_open == false) {
         hp = 3;
         
         // Qua ngày mới luôn
-        obj_game_manager.reset_shop(); 
-        obj_game_manager.day_count += 1; // CẬP NHẬT NGÀY MỚI
-        
-        // Tạo thời tiết ngẫu nhiên cho ngày hôm sau
-        var _rain_chance = irandom(99); 
-        if (_rain_chance < 30) obj_game_manager.is_raining = true; else obj_game_manager.is_raining = false;
-
-        with (obj_dirt) {
-            // Thời gian thực lo việc cây lớn, đi ngủ chỉ tính thời tiết và sâu bọ
-            if (obj_game_manager.is_raining == true) is_watered = true; else is_watered = false; 
-            
-            // TỈ LỆ 20% SINH SÂU BỆNH QUA ĐÊM 
-            if (plant_stage > 0 && plant_stage < 4) {
-                if (irandom(100) < 20) {
-                    is_infected = true;
-                }
-            }
-            
-            // TỈ LỆ 15% MỌC CỎ DẠI QUA ĐÊM (Áp dụng cho đất đã cuốc)
-            if (state == 1 && has_weed == false) {
-                if (irandom(100) < 15) {
-                    has_weed = true;
-                }
-            }
-        }
+        obj_game_manager.advance_time(6);
         
         // --- TỰ ĐỘNG LƯU GAME SAU KHI NGẤT XỈU VÀO ĐÚNG SLOT ĐANG CHƠI ---
         obj_game_manager.save_game(global.current_save_file, global.player_name);
@@ -76,10 +57,18 @@ if (_is_ui_open == false) {
     // ==========================================
     if (keyboard_check_pressed(ord("E"))) {
         var _current_item = inventory[selected_slot];
-        if (_current_item == 7 || _current_item == 11) { // Ăn Cà Chua Thường hoặc Hạng A
+        if (_current_item == 7 || _current_item == 11 || _current_item == 12) { // Ăn Cà Chua Thường, Hạng A, Hạng B
             if (hunger < 100 || hp < 3) {
-                var _hunger_heal = (_current_item == 11) ? 50 : 30; // Hạng A hồi 50 đói, thường hồi 30
-                var _hp_heal = (_current_item == 11) ? 2 : 1;       // Hạng A hồi 2 máu, thường hồi 1
+                var _hunger_heal = 30; // Thường hồi 30
+                var _hp_heal = 1;      // Thường hồi 1
+                
+                if (_current_item == 11) { // Hạng A
+                    _hunger_heal = 50;
+                    _hp_heal = 2;
+                } else if (_current_item == 12) { // Hạng B
+                    _hunger_heal = 15; // Hạng B hồi cực ít
+                    _hp_heal = 0;      // Hạng B không hồi máu
+                }
                 
                 hunger += _hunger_heal; 
                 if (hunger > 100) hunger = 100;
@@ -261,7 +250,7 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
         
         // BÁN NÔNG SẢN
         if (_target_bin != noone) {
-            if (_current_item == 7 || _current_item == 11) { // Bán Cà chua thường hoặc Hạng A
+            if (_current_item == 7 || _current_item == 11 || _current_item == 12) { // Bán Cà chua thường, Hạng A, Hạng B
                 var _sell_amount = inventory_count[selected_slot];
                 var _earned = _sell_amount * obj_game_manager.item_prices[_current_item]; 
                 
@@ -275,39 +264,34 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
             }
         }
         
-        // ĐI NGỦ QUA NGÀY MỚI
+        // ĐI NGỦ (CHỈ CHO PHÉP SAU 18:00 VÀ TRƯỚC 6:00, ĐẾN THẲNG 6:00 SÁNG)
         if (_target_bed != noone) {
-            obj_game_manager.reset_shop(); 
-            obj_game_manager.day_count += 1; // CẬP NHẬT NGÀY MỚI
-            effect_create_above(ef_star, x + 32, y, 2, c_yellow);
-            
-            // Hồi phục 50 thức ăn khi đi ngủ
-            hunger += 50; 
-            if (hunger > 100) hunger = 100;
-
-            var _rain_chance = irandom(99); 
-            if (_rain_chance < 30) obj_game_manager.is_raining = true; else obj_game_manager.is_raining = false;
-
-            with (obj_dirt) {
-                if (obj_game_manager.is_raining == true) is_watered = true; else is_watered = false; 
+            var _cur_h = obj_game_manager.game_hour;
+            if (_cur_h >= 18 || _cur_h < 6) {
+                var _hours_diff = 0;
+                if (_cur_h >= 18) _hours_diff = 24 - _cur_h + 6;
+                else _hours_diff = 6 - _cur_h;
                 
-                // TỈ LỆ 20% SINH SÂU BỆNH QUA ĐÊM (Nếu đang có cây)
-                if (plant_stage > 0 && plant_stage < 4) {
-                    if (irandom(100) < 20) {
-                        is_infected = true;
-                    }
-                }
+                var _minutes_diff = -obj_game_manager.game_minute;
+                var _total_hours_passed = _hours_diff + (_minutes_diff / 60);
                 
-                // TỈ LỆ 15% MỌC CỎ DẠI QUA ĐÊM (Nếu đất đã cuốc)
-                if (state == 1 && has_weed == false) {
-                    if (irandom(100) < 15) {
-                        has_weed = true;
-                    }
-                }
+                obj_game_manager.game_minute = 0;
+                obj_game_manager.advance_time(_total_hours_passed);
+                // Đảm bảo không bị sai số float
+                obj_game_manager.game_hour = 6;
+                
+                effect_create_above(ef_star, x + 32, y, 2, c_yellow);
+                
+                // Hồi phục 50 thức ăn khi đi ngủ
+                hunger += 50; 
+                if (hunger > 100) hunger = 100;
+                
+                // --- TỰ ĐỘNG LƯU GAME VÀO ĐÚNG SLOT KHI ĐI NGỦ ---
+                obj_game_manager.save_game(global.current_save_file, global.player_name);
+            } else {
+                obj_game_manager.show_dialogue = true;
+                obj_game_manager.dialogue_text = "Trời vẫn còn sáng, chưa thể ngủ được!";
             }
-            
-            // --- TỰ ĐỘNG LƯU GAME VÀO ĐÚNG SLOT KHI ĐI NGỦ ---
-            obj_game_manager.save_game(global.current_save_file, global.player_name);
         }
         
         // ==========================================
@@ -321,15 +305,27 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
                 var _crop_id = 7; // Mặc định Cà Chua thường (Hạng B)
                 var _yield = 1; 
                 
-                // HỆ THỐNG PHÂN LOẠI CHẤT LƯỢNG
-                if (_target_dirt.is_fertilized == true && _target_dirt.is_neglected == false) {
-                    _crop_id = 11; // Chuyển thành Cà chua Hạng A
-                    _yield = 3;    // Năng suất cao
-                    show_debug_message("Tuyệt vời! Thu hoạch Cà Chua Hạng A!");
-                    effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_yellow); // Hiệu ứng sao vàng
+                // HỆ THỐNG PHÂN LOẠI CHẤT LƯỢNG MỚI DỰA TRÊN PHÂN BÓN VÀ CỎ DẠI
+                if (_target_dirt.is_fertilized == true) {
+                    if (_target_dirt.has_weed == false) {
+                        _crop_id = 11; // Có phân bón, không cỏ -> Hạng A
+                        _yield = 3;
+                        effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_yellow);
+                    } else {
+                        _crop_id = 7; // Có phân bón, có cỏ -> Tụt xuống Thường
+                        _yield = 1;
+                        effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
+                    }
                 } else {
-                    show_debug_message("Thu hoạch Cà Chua thường.");
-                    effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
+                    if (_target_dirt.has_weed == false) {
+                        _crop_id = 7; // Không bón, không cỏ -> Thường
+                        _yield = 1;
+                        effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
+                    } else {
+                        _crop_id = 12; // Không bón, có cỏ -> Hạng B (Kém)
+                        _yield = 1;
+                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_gray);
+                    }
                 }
                 
                 if (_target_dirt.plant_type == 3) _crop_id = 3; // Nếu là ngô, trả lại ngô (tạm thời)
@@ -349,11 +345,11 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
                     inventory_count[_empty_slot] = _yield;
                 }
                 
-                // Trả đất về trạng thái trống
+                // Trả đất về trạng thái trống, NHƯNG GIỮ LẠI CỎ DẠI NẾU CÓ
                 _target_dirt.plant_stage = 0; 
                 _target_dirt.is_fertilized = false; 
                 _target_dirt.is_infected = false; 
-                _target_dirt.has_weed = false;
+                // Cố tình không đặt _target_dirt.has_weed = false; để giữ nguyên cỏ dại
                 _target_dirt.is_neglected = false; // Reset lại lịch sử bỏ bê
                 _target_dirt.growth_timer = 0;
                 _target_dirt.rot_timer = 0;

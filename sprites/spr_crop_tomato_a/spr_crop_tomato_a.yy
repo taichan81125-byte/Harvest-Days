@@ -1,4 +1,4 @@
-{
+﻿{
   "$GMSprite":"v2",
   "%Name":"spr_crop_tomato_a",
   "bboxMode":0,
@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"HarvestDays",
-    "path":"HarvestDays.yyp",
+    "name":"Crops",
+    "path":"folders/Sprites/Crops.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
