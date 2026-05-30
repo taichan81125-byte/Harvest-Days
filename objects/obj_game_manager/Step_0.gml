@@ -77,7 +77,7 @@ var _mx = device_mouse_x_to_gui(0);
 var _my = device_mouse_y_to_gui(0);
 
 // 1. CLICK ICON BÁNH RĂNG (MỞ PAUSE)
-if (is_paused == false && _mx > 1180 && _mx < 1244 && _my > 20 && _my < 84) {
+if (is_paused == false && _mx > 1200 && _mx < 1260 && _my > 0 && _my < 50) {
     is_paused = true;
     show_shop = false;
     show_dialogue = false;

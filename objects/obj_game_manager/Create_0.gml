@@ -25,7 +25,7 @@ day_overlay_color = c_black; // Màu lớp phủ
 
 // Đặt tâm của mặt đồng hồ và kim đồng hồ vào chính giữa (vì ảnh gốc 450x450)
 sprite_set_offset(spr_mat_dong_ho, 225, 225);
-sprite_set_offset(spr_kim_dong_ho, 225, 225);
+sprite_set_offset(spr_kim_dong_ho, 225, 245);
 
 // Khung thời gian giữ offset 0,0 (góc trên bên trái)
 

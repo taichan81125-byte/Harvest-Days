@@ -27,33 +27,37 @@ if (room == rm_farm) {
     draw_set_color(c_dkgray); draw_rectangle(_ui_right_x, _bar_y, _ui_right_x + 100, _bar_y + 15, false); 
     draw_set_color(c_orange); draw_rectangle(_ui_right_x, _bar_y, _ui_right_x + obj_player.hunger, _bar_y + 15, false); 
     draw_set_color(c_white); draw_rectangle(_ui_right_x, _bar_y, _ui_right_x + 100, _bar_y + 15, true); 
-    draw_text(_ui_right_x - 70, _bar_y - 5, "Đói:"); 
 
-    draw_sprite(spr_icon_gear, 0, 1180, 20);
+    draw_sprite_ext(spr_icon_gear, 0, 1155, -19, 0.33, 0.33, 0, c_white, 1);
 
     // ==========================================
     // VẼ ĐỒNG HỒ VÀ NGÀY
     // ==========================================
     var _clock_str = string(game_hour) + ":" + (game_minute < 10 ? "0" : "") + string(game_minute);
     
-    // Đặt đồng hồ ở giữa trái tim (1022) và nút cài đặt (1180), nên _cx tầm 1100
-    var _cx = 1100;
+    // Đặt đồng hồ ở giữa trái tim (1022) và nút cài đặt (1180), nên _cx tầm 1130
+    var _cx = 1130;
     var _cy = 50;
     var _clock_scale = 160 / 450; // Cho đồng hồ to hơn (đường kính tầm 160px)
     
     draw_sprite_ext(spr_mat_dong_ho, 0, _cx, _cy, _clock_scale, _clock_scale, 0, c_white, 1);
     
     var _time_decimal = game_hour + (game_minute / 60);
-    var _angle = 90 - ((_time_decimal - 6) / 24) * 360;
+    // Đồng hồ quay thuận chiều kim (12h/vòng):
+    // 00h/12h -> Góc 0 (Chỉ lên trên)
+    // 03h/15h -> Góc -90 (Chỉ sang phải)
+    // 06h/18h -> Góc -180 (Chỉ xuống dưới)
+    // 09h/21h -> Góc 90 (Chỉ sang trái)
+    var _angle = -(_time_decimal * 30);
     
     draw_sprite_ext(spr_kim_dong_ho, 0, _cx, _cy, _clock_scale, _clock_scale, _angle, c_white, 1);
 
     // Text Ngày và Giờ (Cắt xa nhau ra một chút)
     draw_set_color(c_white);
     draw_set_halign(fa_center);
-    draw_text(_cx, _cy + 95, "Ngày " + string(day_count));
+    draw_text(_cx, _cy + 45, "Ngày " + string(day_count));
     draw_set_color(c_yellow);
-    draw_text(_cx, _cy + 120, _clock_str);
+    draw_text(_cx, _cy + 75, _clock_str);
     draw_set_halign(fa_left);
     var _start_x = 340; var _y = 650;       
     
