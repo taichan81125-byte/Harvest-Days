@@ -1,3 +1,7 @@
+// Đổi con trỏ chuột sang sprite mới và ẩn con trỏ chuột hệ thống
+cursor_sprite = spr_mouse;
+window_set_cursor(cr_none);
+
 // Biến kiểm tra xem hộp thoại có đang mở không (mặc định là tắt)
 show_dialogue = false;
 

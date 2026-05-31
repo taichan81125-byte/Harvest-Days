@@ -1,5 +1,26 @@
 // 1. LẤY THÔNG TIN VẬT PHẨM ĐANG CẦM
-var _current_item = inventory[selected_slot];
+var _current_item = -1;
+if (selected_slot != -1) _current_item = inventory[selected_slot];
+
+// 0. VẼ VIỀN HIGHLIGHT CHỈ ĐỊNH (GRID HIGHLIGHT)
+if (obj_game_manager.is_paused == false && _current_item != -1) {
+    if (is_action_valid) {
+        draw_set_color(c_lime);
+        draw_set_alpha(0.3);
+    } else {
+        draw_set_color(c_red);
+        draw_set_alpha(0.3);
+    }
+    // Vẽ một ô vuông mờ
+    draw_rectangle(mouse_tile_x, mouse_tile_y, mouse_tile_x + 63, mouse_tile_y + 63, false);
+    
+    // Vẽ viền ngoài đậm hơn một chút
+    draw_set_alpha(0.8);
+    draw_rectangle(mouse_tile_x, mouse_tile_y, mouse_tile_x + 63, mouse_tile_y + 63, true);
+    
+    draw_set_color(c_white);
+    draw_set_alpha(1.0);
+}
 
 // NẾU KHÔNG CẦM GÌ, CHỈ VẼ NHÂN VẬT VÀ THOÁT LUÔN
 if (_current_item == -1) {

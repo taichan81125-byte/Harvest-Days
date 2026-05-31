@@ -6,14 +6,7 @@ if (_is_ui_open == false) {
     // ==========================================
     // HỆ THỐNG SINH TỒN (TRỪ ĐÓI, MẤT MÁU, NGẤT XỈU)
     // ==========================================
-    // 1. Trừ thức ăn theo thời gian
-    // Ban đêm (từ 20:00 đến 6:00 sáng) thức ăn giảm nhanh gấp 3 lần để ép người chơi đi ngủ
-    var _hunger_drain = 0.01;
-    if (obj_game_manager.game_hour >= 20 || obj_game_manager.game_hour < 6) {
-        _hunger_drain = 0.03;
-    }
-    hunger -= _hunger_drain; 
-    if (hunger < 0) hunger = 0;
+    // 1. (Đã bỏ trừ thức ăn theo thời gian)
 
     // 2. Chậm lại nếu quá đói
     if (hunger < 30) move_speed = base_speed / 2; // Đi chậm một nửa
@@ -65,7 +58,7 @@ if (_is_ui_open == false) {
     // ==========================================
     // TÍNH NĂNG ĂN UỐNG (PHÍM E)
     // ==========================================
-    if (keyboard_check_pressed(ord("E"))) {
+    if (keyboard_check_pressed(ord("E")) && selected_slot != -1) {
         var _current_item = inventory[selected_slot];
         if (_current_item == 7 || _current_item == 11 || _current_item == 12) { // Ăn Cà Chua Thường, Hạng A, Hạng B
             if (hunger < 100 || hp < 3) {
@@ -103,16 +96,16 @@ if (_is_ui_open == false) {
     // CHỌN CÔNG CỤ & POPUP
     // ==========================================
     var _slot_changed = false;
-    if (keyboard_check_pressed(ord("1"))) { selected_slot = 0; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("2"))) { selected_slot = 1; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("3"))) { selected_slot = 2; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("4"))) { selected_slot = 3; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("5"))) { selected_slot = 4; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("6"))) { selected_slot = 5; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("7"))) { selected_slot = 6; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("8"))) { selected_slot = 7; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("9"))) { selected_slot = 8; _slot_changed = true; }
-    if (keyboard_check_pressed(ord("0"))) { selected_slot = 9; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("1"))) { if (selected_slot == 0) selected_slot = -1; else selected_slot = 0; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("2"))) { if (selected_slot == 1) selected_slot = -1; else selected_slot = 1; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("3"))) { if (selected_slot == 2) selected_slot = -1; else selected_slot = 2; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("4"))) { if (selected_slot == 3) selected_slot = -1; else selected_slot = 3; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("5"))) { if (selected_slot == 4) selected_slot = -1; else selected_slot = 4; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("6"))) { if (selected_slot == 5) selected_slot = -1; else selected_slot = 5; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("7"))) { if (selected_slot == 6) selected_slot = -1; else selected_slot = 6; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("8"))) { if (selected_slot == 7) selected_slot = -1; else selected_slot = 7; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("9"))) { if (selected_slot == 8) selected_slot = -1; else selected_slot = 8; _slot_changed = true; }
+    if (keyboard_check_pressed(ord("0"))) { if (selected_slot == 9) selected_slot = -1; else selected_slot = 9; _slot_changed = true; }
 
     if (_slot_changed == true) item_popup_timer = 90;
     if (item_popup_timer > 0) item_popup_timer -= 1;
@@ -220,36 +213,93 @@ if (obj_game_manager.show_shop == true && obj_game_manager.is_paused == false) {
 }
 
 // ==========================================
-// TƯƠNG TÁC SPACE VỚI MÔI TRƯỜNG
+// CẬP NHẬT GRID MOUSE VÀ TÍNH HỢP LỆ
 // ==========================================
-// THÊM BIẾN KIỂM TRA ĐỂ KHÔNG TƯƠNG TÁC KHI ĐANG PAUSE
-else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false) {
+mouse_tile_x = floor(mouse_x / 64) * 64;
+mouse_tile_y = floor(mouse_y / 64) * 64;
+
+var _dist = point_distance(x, y, mouse_tile_x + 32, mouse_tile_y + 32);
+is_mouse_in_reach = (_dist <= 120);
+
+// Kiểm tra tính hợp lệ sơ bộ của ô
+is_action_valid = false;
+var _target_bed = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_bed, false, true);
+var _target_dirt = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_dirt, false, true);
+var _target_bin = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_bin, false, true);
+var _target_npc = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_npc_moc, false, true);
+var _target_shop = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_shop, false, true);
+var _target_table = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_table, false, true);
+var _target_deco = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_decoration, false, true);
+var _target_solid = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_solid, false, true);
+
+var _current_item = -1;
+if (selected_slot != -1) _current_item = inventory[selected_slot]; 
+
+if (_current_item == 0) { // Cuốc
+    if (_target_solid == noone && _target_dirt == noone && _target_bed == noone && _target_bin == noone && _target_shop == noone && _target_table == noone && _target_npc == noone) is_action_valid = true;
+} else if (_current_item == 1) { // Bình tưới
+    if (_target_dirt != noone && _target_dirt.state == 1) is_action_valid = true;
+} else if (_current_item == 2 || _current_item == 3) { // Hạt giống
+    if (_target_dirt != noone && _target_dirt.state == 1 && _target_dirt.plant_stage == 0 && _target_dirt.has_weed == false) is_action_valid = true;
+} else if (_current_item >= 4 && _current_item <= 6) { // Đồ trang trí
+    if (_target_solid == noone && _target_dirt == noone && _target_bed == noone && _target_bin == noone && _target_shop == noone && _target_table == noone && _target_npc == noone) is_action_valid = true;
+} else if (_current_item == 8) { // Phân bón
+    if (_target_dirt != noone && _target_dirt.state == 1 && _target_dirt.is_fertilized == false && _target_dirt.plant_stage == 0 && _target_dirt.has_weed == false) is_action_valid = true;
+} else if (_current_item == 9) { // Thuốc sinh học
+    if (_target_dirt != noone && _target_dirt.is_infected == true) is_action_valid = true;
+} else if (_current_item == 10) { // Liềm
+    if (_target_dirt != noone && (_target_dirt.has_weed == true || _target_dirt.plant_stage == 4)) is_action_valid = true;
+}
+
+// Luôn cho phép valid nếu nhấp vào NPC, giường, thùng, bàn, đồ trang trí, nông sản đã chín
+if (_target_npc != noone || _target_bed != noone || _target_bin != noone || _target_table != noone || _target_shop != noone || _target_deco != noone) {
+    is_action_valid = true;
+}
+if (_target_dirt != noone && _target_dirt.plant_stage == 3) { // Thu hoạch nông sản
+    is_action_valid = true;
+}
+
+if (!is_mouse_in_reach) is_action_valid = false;
+
+// ==========================================
+// TƯƠNG TÁC BẰNG CHUỘT HOẶC SPACE VỚI MÔI TRƯỜNG
+// ==========================================
+var _is_ui_click = false;
+if (mouse_check_button_pressed(mb_left) && obj_game_manager.is_paused == false) {
+    var _gui_y = device_mouse_y_to_gui(0);
+    var _gui_x = device_mouse_x_to_gui(0);
+    if (_gui_y >= 650 && _gui_y <= 700 && _gui_x >= 340 && _gui_x <= 940) { 
+        _is_ui_click = true;
+        var _clicked_slot = floor((_gui_x - 340) / 60);
+        if (_clicked_slot > 9) _clicked_slot = 9;
+        if (selected_slot == _clicked_slot) selected_slot = -1; else selected_slot = _clicked_slot;
+        item_popup_timer = 90;
+    }
+}
+
+if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) && !_is_ui_click)) && obj_game_manager.is_paused == false) {
     if (obj_game_manager.show_dialogue == true) {
         obj_game_manager.show_dialogue = false;
     }
-    else {
-        var _interact_x = x + lengthdir_x(48, facing_dir);
-        var _interact_y = (y - 32) + lengthdir_y(48, facing_dir);
+    else if (is_mouse_in_reach) {
+        // Cập nhật hướng quay mặt theo hướng click
+        var _dir = point_direction(x, y, mouse_tile_x + 32, mouse_tile_y + 32);
+        if (_dir >= 45 && _dir < 135) facing_dir = 90;
+        else if (_dir >= 135 && _dir < 225) facing_dir = 180;
+        else if (_dir >= 225 && _dir < 315) facing_dir = 270;
+        else facing_dir = 0;
+        
+        var _interact_x = mouse_tile_x + 32;
+        var _interact_y = mouse_tile_y + 32;
 
-        var _target_bed = collision_circle(_interact_x, _interact_y, 32, obj_bed, false, true);
-        var _target_dirt = collision_circle(_interact_x, _interact_y, 32, obj_dirt, false, true);
-        var _target_bin = collision_circle(_interact_x, _interact_y, 32, obj_bin, false, true);
-        var _target_npc = collision_circle(_interact_x, _interact_y, 32, obj_npc_moc, false, true);
-        var _target_shop = collision_circle(_interact_x, _interact_y, 32, obj_shop, false, true);
-        var _target_table = collision_circle(_interact_x, _interact_y, 32, obj_table, false, true);
-        var _target_deco = collision_circle(_interact_x, _interact_y, 32, obj_decoration, false, true);
-        var _target_solid = collision_circle(_interact_x, _interact_y, 32, obj_solid, false, true);
-        
-        var _current_item = inventory[selected_slot]; 
-        
         if (_target_npc != noone) obj_game_manager.show_dialogue = true;
         if (_target_shop != noone) obj_game_manager.show_shop = true;
         
         if (_target_table != noone) {
             if (_target_table.has_tools == true) {
-                var _items_to_give = [[0, 1], [1, 1], [2, 6]];
+                var _items_to_give = [[0, 1], [1, 1], [2, 6], [10, 1]];
                 
-                for (var i = 0; i < 3; i++) {
+                for (var i = 0; i < 4; i++) {
                     var _id = _items_to_give[i][0];
                     var _amt = _items_to_give[i][1];
                     var _found = -1;
@@ -288,7 +338,7 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
             }
         }
         
-        // ĐI NGỦ (CHỈ CHO PHÉP SAU 18:00 VÀ TRƯỚC 6:00, ĐẾN THẲNG 6:00 SÁNG)
+        // ĐI NGỦ
         if (_target_bed != noone) {
             var _cur_h = obj_game_manager.game_hour;
             if (_cur_h >= 18 || _cur_h < 6) {
@@ -301,16 +351,13 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
                 
                 obj_game_manager.game_minute = 0;
                 obj_game_manager.advance_time(_total_hours_passed);
-                // Đảm bảo không bị sai số float
                 obj_game_manager.game_hour = 6;
                 
                 effect_create_above(ef_star, x + 32, y, 2, c_yellow);
                 
-                // Hồi phục 50 thức ăn khi đi ngủ
                 hunger += 50; 
                 if (hunger > 100) hunger = 100;
                 
-                // --- TỰ ĐỘNG LƯU GAME VÀO ĐÚNG SLOT KHI ĐI NGỦ ---
                 obj_game_manager.save_game(global.current_save_file, global.player_name);
             } else {
                 obj_game_manager.show_dialogue = true;
@@ -318,45 +365,35 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
             }
         }
         
-        // ==========================================
         // TƯƠNG TÁC ĐẤT VÀ VUNG TAY
-        // ==========================================
         if (_target_dirt != noone) {
-            action_timer = 15; 
             
-            // 1. THU HOẠCH NÔNG SẢN (Chỉ khi Giai đoạn 3)
+            // THU HOẠCH NÔNG SẢN
             if (_target_dirt.plant_stage == 3) {
-                var _crop_id = 7; // Mặc định Cà Chua thường (Hạng B)
+                action_timer = 15;
+                hunger -= irandom_range(1, 3);
+                if (hunger < 0) hunger = 0;
+                var _crop_id = 7;
                 var _yield = 1; 
                 
-                // HỆ THỐNG PHÂN LOẠI CHẤT LƯỢNG MỚI DỰA TRÊN PHÂN BÓN VÀ CỎ DẠI
                 if (_target_dirt.is_fertilized == true) {
                     if (_target_dirt.has_weed == false) {
-                        _crop_id = 11; // Có phân bón, không cỏ -> Hạng A
-                        _yield = 3;
-                        effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_yellow);
+                        _crop_id = 11; _yield = 3; effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_yellow);
                     } else {
-                        _crop_id = 7; // Có phân bón, có cỏ -> Tụt xuống Thường
-                        _yield = 1;
-                        effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
+                        _crop_id = 7; _yield = 1; effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
                     }
                 } else {
                     if (_target_dirt.has_weed == false) {
-                        _crop_id = 7; // Không bón, không cỏ -> Thường
-                        _yield = 1;
-                        effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
+                        _crop_id = 7; _yield = 1; effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
                     } else {
-                        _crop_id = 12; // Không bón, có cỏ -> Hạng B (Kém)
-                        _yield = 1;
-                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_gray);
+                        _crop_id = 12; _yield = 1; effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_gray);
                     }
                 }
                 
-                if (_target_dirt.plant_type == 3) _crop_id = 3; // Nếu là ngô, trả lại ngô (tạm thời)
+                if (_target_dirt.plant_type == 3) _crop_id = 3; 
                 
                 var _found_slot = -1;
                 var _empty_slot = -1;
-                
                 for(var k = 0; k < 10; k++) {
                     if (inventory[k] == _crop_id) { _found_slot = k; break; }
                     if (inventory[k] == -1 && _empty_slot == -1) { _empty_slot = k; }
@@ -369,108 +406,83 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
                     inventory_count[_empty_slot] = _yield;
                 }
                 
-                // Trả đất về trạng thái trống, NHƯNG GIỮ LẠI CỎ DẠI NẾU CÓ
                 _target_dirt.plant_stage = 0; 
                 _target_dirt.is_fertilized = false; 
                 _target_dirt.is_infected = false; 
-                // Cố tình không đặt _target_dirt.has_weed = false; để giữ nguyên cỏ dại
-                _target_dirt.is_neglected = false; // Reset lại lịch sử bỏ bê
+                _target_dirt.is_neglected = false; 
                 _target_dirt.growth_timer = 0;
                 _target_dirt.rot_timer = 0;
             }
-            // 2. SỬ DỤNG CÔNG CỤ HOẶC HẠT GIỐNG
-            else { 
-                if (_current_item == 0) { // CẦM CUỐC
-                    if (_target_dirt.state == 0) {
-                        _target_dirt.state = 1; 
-                        hunger -= 5; 
-                        if (hunger < 0) hunger = 0;
-                        
-                        // PHÁT ÂM THANH CUỐC ĐẤT
-                        audio_play_sound(snd_hoe, 1, false);
-                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_gray);
-                    }
+            // SỬ DỤNG CÔNG CỤ HOẶC HẠT GIỐNG
+            else if (is_action_valid) { 
+                action_timer = 15;
+                
+                hunger -= irandom_range(1, 3);
+                if (hunger < 0) hunger = 0;
+                
+                if (_current_item == 1) { // Bình tưới
+                    _target_dirt.is_watered = true; 
+                    audio_play_sound(snd_water, 1, false);
+                    effect_create_above(ef_ring, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_aqua);
+                    effect_create_above(ef_spark, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_blue);
                 }
-                else if (_current_item == 1) { // CẦM BÌNH TƯỚI
-                    if (_target_dirt.state == 1) {
-                        _target_dirt.is_watered = true; 
-                        hunger -= 5; 
-                        if (hunger < 0) hunger = 0;
-                        
-                        // PHÁT ÂM THANH TƯỚI NƯỚC
-                        audio_play_sound(snd_water, 1, false);
-                        effect_create_above(ef_ring, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_aqua);
-                        effect_create_above(ef_spark, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_blue);
-                    }
+                else if (_current_item == 2 || _current_item == 3) { // Hạt giống
+                    _target_dirt.plant_stage = 1; 
+                    _target_dirt.plant_type = _current_item; 
+                    if (_current_item == 2) _target_dirt.growth_max = 1800;
+                    else _target_dirt.growth_max = 3600;
+                    
+                    inventory_count[selected_slot] -= 1;
+                    if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
                 }
-                else if (_current_item == 2 || _current_item == 3) { // CẦM HẠT GIỐNG
-                    if (_target_dirt.state == 1 && _target_dirt.plant_stage == 0 && _target_dirt.has_weed == false) {
-                        _target_dirt.plant_stage = 1; 
-                        _target_dirt.plant_type = _current_item; // NHỚ LOẠI CÂY
-                        
-                        if (_current_item == 2) _target_dirt.growth_max = 1800; // 6 tiếng (300 frames * 6)
-                        else _target_dirt.growth_max = 3600; // Ngô 12 tiếng hoặc tuỳ ý
-                        
-                        inventory_count[selected_slot] -= 1;
-                        if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
-                    } else if (_target_dirt.has_weed == true) {
-                        show_debug_message("Đất có cỏ dại, không thể gieo hạt!");
-                    }
+                else if (_current_item == 8) { // Phân bón
+                    _target_dirt.is_fertilized = true; 
+                    inventory_count[selected_slot] -= 1;
+                    if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
+                    effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_white); 
                 }
-                else if (_current_item == 8) { // CẦM PHÂN BÓN
-                    if (_target_dirt.state == 1 && _target_dirt.is_fertilized == false && _target_dirt.plant_stage == 0 && _target_dirt.has_weed == false) {
-                        _target_dirt.is_fertilized = true; 
-                        
-                        inventory_count[selected_slot] -= 1;
-                        if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
-                        
-                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_white); 
-                    } else if (_target_dirt.has_weed == true) {
-                        show_debug_message("Đất có cỏ dại, không thể bón phân!");
-                    }
+                else if (_current_item == 9) { // Thuốc sinh học
+                    _target_dirt.is_infected = false; 
+                    _target_dirt.rot_timer = 0; 
+                    inventory_count[selected_slot] -= 1;
+                    if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
+                    effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_lime);
                 }
-                else if (_current_item == 9) { // CẦM THUỐC SINH HỌC
-                    if (_target_dirt.is_infected == true) {
+                else if (_current_item == 10) { // Liềm
+                    if (_target_dirt.plant_stage == 4) {
+                        _target_dirt.plant_stage = 0; 
+                        _target_dirt.is_fertilized = false; 
                         _target_dirt.is_infected = false; 
-                        _target_dirt.rot_timer = 0; 
-                        
-                        inventory_count[selected_slot] -= 1;
-                        if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
-                        
-                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_lime);
+                        _target_dirt.is_neglected = false;
+                        _target_dirt.growth_timer = 0;
+                        _target_dirt.rot_timer = 0;
+                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_dkgray);
                     }
-                }
-                else if (_current_item == 10) { // CẦM CÁI LIỀM
-                    if (_target_dirt.has_weed == true || _target_dirt.plant_stage == 4) {
-                        
-                        if (_target_dirt.plant_stage == 4) {
-                            _target_dirt.plant_stage = 0; 
-                            _target_dirt.is_fertilized = false; 
-                            _target_dirt.is_infected = false; 
-                            _target_dirt.is_neglected = false;
-                            _target_dirt.growth_timer = 0;
-                            _target_dirt.rot_timer = 0;
-                            effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_dkgray);
-                        }
-                        
-                        if (_target_dirt.has_weed == true) {
-                            _target_dirt.has_weed = false;
-                            effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_green);
-                        }
-                        
-                        hunger -= 2;
-                        if (hunger < 0) hunger = 0;
-                        
-                        // PHÁT ÂM THANH XÀO XẠC KHI DÙNG LIỀM DỌN CỎ
-                        audio_play_sound(snd_hoe, 1, false);
+                    if (_target_dirt.has_weed == true) {
+                        _target_dirt.has_weed = false;
+                        effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_green);
                     }
+                    audio_play_sound(snd_hoe, 1, false);
                 }
             } 
+        }
+        
+        // CUỐC ĐẤT TRỐNG (Tạo obj_dirt)
+        else if (is_action_valid && _current_item == 0) {
+            action_timer = 15;
+            var _new_dirt = instance_create_layer(mouse_tile_x, mouse_tile_y, "Instances", obj_dirt);
+            _new_dirt.state = 1;
+            hunger -= irandom_range(1, 3); 
+            if (hunger < 0) hunger = 0;
+            audio_play_sound(snd_hoe, 1, false);
+            effect_create_above(ef_smoke, mouse_tile_x + 32, mouse_tile_y + 32, 1, c_gray);
         }
         
         // NHẶT ĐỒ TRANG TRÍ
         else if (_target_deco != noone) {
             action_timer = 15;
+            hunger -= irandom_range(1, 3); 
+            if (hunger < 0) hunger = 0;
             var _found_slot = -1;
             var _empty_slot = -1;
             for(var k = 0; k < 10; k++) {
@@ -489,17 +501,15 @@ else if (keyboard_check_pressed(vk_space) && obj_game_manager.is_paused == false
         }
         
         // ĐẶT ĐỒ TRANG TRÍ
-        else if (_current_item >= 4 && _current_item <= 6) {
-            if (_target_bed == noone && _target_dirt == noone && _target_bin == noone && _target_shop == noone && _target_table == noone && _target_npc == noone && _target_solid == noone) {
-                action_timer = 15;
-                var _place_x = floor(_interact_x / 64) * 64;
-                var _place_y = floor(_interact_y / 64) * 64;
-                var _new_deco = instance_create_layer(_place_x, _place_y, "Instances", obj_decoration);
-                _new_deco.item_id = _current_item; 
-                
-                inventory_count[selected_slot] -= 1;
-                if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1;
-            }
+        else if (_current_item >= 4 && _current_item <= 6 && is_action_valid) {
+            action_timer = 15;
+            hunger -= irandom_range(1, 3); 
+            if (hunger < 0) hunger = 0;
+            var _new_deco = instance_create_layer(mouse_tile_x, mouse_tile_y, "Instances", obj_decoration);
+            _new_deco.item_id = _current_item; 
+            
+            inventory_count[selected_slot] -= 1;
+            if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1;
         }
     } 
 }

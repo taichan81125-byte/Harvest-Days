@@ -85,6 +85,7 @@
     {"id":{"name":"spr_khung_thoi_gian","path":"sprites/spr_khung_thoi_gian/spr_khung_thoi_gian.yy",},},
     {"id":{"name":"spr_kim_dong_ho","path":"sprites/spr_kim_dong_ho/spr_kim_dong_ho.yy",},},
     {"id":{"name":"spr_mat_dong_ho","path":"sprites/spr_mat_dong_ho/spr_mat_dong_ho.yy",},},
+    {"id":{"name":"spr_mouse","path":"sprites/spr_mouse/spr_mouse.yy",},},
     {"id":{"name":"spr_npc_moc","path":"sprites/spr_npc_moc/spr_npc_moc.yy",},},
     {"id":{"name":"spr_plant_mature","path":"sprites/spr_plant_mature/spr_plant_mature.yy",},},
     {"id":{"name":"spr_plant_sprout","path":"sprites/spr_plant_sprout/spr_plant_sprout.yy",},},

@@ -21,3 +21,9 @@ inventory_count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 hunger = 100;       // Thanh thức ăn (Tối đa 100)
 hp = 3;             // ĐÃ ĐỔI TỪ HEALTH THÀNH HP (Máu - Tối đa 3 trái tim)
 hp_timer = 0;       // Bộ đếm thời gian để trừ máu khi đói
+
+// --- HỆ THỐNG TƯƠNG TÁC BẰNG CHUỘT (GRID INTERACTION) ---
+mouse_tile_x = 0;
+mouse_tile_y = 0;
+is_action_valid = false;
+is_mouse_in_reach = false;

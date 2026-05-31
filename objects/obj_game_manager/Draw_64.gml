@@ -80,7 +80,7 @@ if (room == rm_farm) {
         draw_set_color(c_yellow); if (j == 9) draw_text(_slot_x + 5, _y - 25, "0"); else draw_text(_slot_x + 5, _y - 25, string(j + 1));
     }
     
-    if (obj_player.item_popup_timer > 0) {
+    if (obj_player.item_popup_timer > 0 && obj_player.selected_slot != -1) {
         var _current_item = obj_player.inventory[obj_player.selected_slot];
         if (_current_item != -1) {
             var _item_name = item_names[_current_item]; var _alpha = 1.0;

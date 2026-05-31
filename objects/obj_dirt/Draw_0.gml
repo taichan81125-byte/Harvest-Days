@@ -60,7 +60,7 @@ if (plant_stage == 1 || plant_stage == 2) {
     var _bar_h_scaled = _inner_h * _scale;
     
     if (is_watered == true && is_infected == false) {
-        var _percent = growth_timer / 7200; 
+        var _percent = growth_timer / growth_max; 
         if (_percent > 1) _percent = 1;
         
         draw_set_color(c_lime); 
