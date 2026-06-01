@@ -3,7 +3,7 @@ draw_set_font(fnt_vietnamese);
 // ==========================================
 // HIỆU ỨNG ÁNH SÁNG NGÀY/ĐÊM (VẼ TRƯỚC TIÊN ĐỂ KHÔNG ĐÈ LÊN UI)
 // ==========================================
-if (room == rm_farm && day_overlay_alpha > 0) {
+if ((room == rm_farm || room == rm_house) && day_overlay_alpha > 0) {
     draw_set_color(day_overlay_color);
     draw_set_alpha(day_overlay_alpha);
     // Hardcode kích thước GUI là 1280x720 cho chắc chắn
@@ -14,7 +14,7 @@ if (instance_exists(obj_player)) {
 draw_set_color(c_yellow);
 draw_text(20, 20, "Tiền (Coins): " + string(obj_player.coins));
 
-if (room == rm_farm) {
+if (room == rm_farm || room == rm_house) {
     // Kéo các UI như tim và thức ăn sang trái một chút (về tọa độ 950) để nhường chỗ cho Đồng hồ
     var _ui_right_x = 950; 
     

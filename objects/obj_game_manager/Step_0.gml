@@ -1,7 +1,7 @@
 // ==========================================
 // CẬP NHẬT ĐỒNG HỒ SINH HỌC & HIỆU ỨNG ÁNH SÁNG
 // ==========================================
-if (is_paused == false && room == rm_farm) {
+if (is_paused == false && (room == rm_farm || room == rm_house)) {
     time_ticker += 1;
     
     if (time_ticker >= frames_per_game_minute) {
@@ -51,7 +51,7 @@ if (is_paused == false && room == rm_farm) {
     }
 }
 
-if (is_raining == true) {
+if (is_raining == true && room != rm_house) {
 effect_create_above(ef_rain, 0, 0, 1, c_silver);
 }
 
