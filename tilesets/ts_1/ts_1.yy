@@ -1,4 +1,4 @@
-﻿{
+{
   "$GMTileSet":"v1",
   "%Name":"ts_1",
   "autoTileSets":[],
