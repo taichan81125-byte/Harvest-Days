@@ -52,7 +52,24 @@ if (is_paused == false && (room == rm_farm || room == rm_house)) {
 }
 
 if (is_raining == true && room != rm_house) {
-effect_create_above(ef_rain, 0, 0, 1, c_silver);
+    if (current_season == 3) {
+        effect_create_above(ef_snow, 0, 0, 1, c_white); // Mùa đông: Tuyết
+    } else {
+        effect_create_above(ef_rain, 0, 0, 1, c_silver); // Mùa khác: Mưa
+    }
+}
+
+// Hiệu ứng rơi rớt theo mùa
+if (room != rm_house) {
+    if (current_season == 0) { // Xuân: Hoa anh đào rơi
+        if (irandom(100) < 5) {
+            effect_create_above(ef_flare, irandom(room_width), irandom(room_height), 0, c_fuchsia);
+        }
+    } else if (current_season == 2) { // Thu: Lá vàng rơi
+        if (irandom(100) < 5) {
+            effect_create_above(ef_flare, irandom(room_width), irandom(room_height), 0, c_orange);
+        }
+    }
 }
 
 // BẤM ESC ĐỂ BẬT/TẮT PAUSE

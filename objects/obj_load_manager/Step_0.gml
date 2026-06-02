@@ -40,11 +40,13 @@ if (mouse_check_button_pressed(mb_left)) {
         
         // 1. KIỂM TRA CLICK VÀO NÚT XÓA (MÀU ĐỎ)
         if (slot_names[i] != "Trống") {
-            if (_mx > _start_x + 500 && _mx < _start_x + 580 && _my > _btn_y + 25 && _my < _btn_y + 75) {
-                if (file_exists(slot_files[i])) file_delete(slot_files[i]); // Xóa file trong ổ cứng
-                slot_names[i] = "Trống"; // Reset giao diện
-                slot_days[i] = 0;
-                continue; // Bỏ qua phần click bên dưới
+            if (i != 3) {
+                if (_mx > _start_x + 500 && _mx < _start_x + 580 && _my > _btn_y + 25 && _my < _btn_y + 75) {
+                    if (file_exists(slot_files[i])) file_delete(slot_files[i]); // Xóa file trong ổ cứng
+                    slot_names[i] = "Trống"; // Reset giao diện
+                    slot_days[i] = 0;
+                    continue; // Bỏ qua phần click bên dưới
+                }
             }
         }
         
@@ -62,6 +64,11 @@ if (mouse_check_button_pressed(mb_left)) {
                 global.current_save_file = slot_files[i];
                 global.player_name = slot_names[i];
                 global.is_new_game = false; // Đánh dấu là Load Game
+                
+                if (i == 3 && !file_exists(slot_files[3])) {
+                    global.is_new_game = true;
+                }
+                
                 room_goto(rm_farm);
             }
         }

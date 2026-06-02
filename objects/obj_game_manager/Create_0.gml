@@ -27,7 +27,7 @@ is_raining = false;
 game_hour = 6;              // Giờ hiện tại (0-23), bắt đầu lúc 6h sáng
 game_minute = 0;            // Phút hiện tại (0-59)
 time_ticker = 0;            // Bộ đếm frame nội bộ
-frames_per_game_minute = 5; // 5 frames = 1 phút game (300 frames = 1 giờ @ 60fps)
+frames_per_game_minute = (global.player_name == "Admin_farm") ? 2 : 5; // Admin thời gian trôi siêu tốc (gấp 2.5 lần)
 
 // Hiệu ứng ngày/đêm
 day_overlay_alpha = 0;      // Độ tối của lớp phủ
@@ -58,6 +58,7 @@ function advance_time(_hours) {
     
     if (_days_passed > 0) {
         day_count += _days_passed;
+        current_season = ((day_count - 1) div 28) % 4;
         reset_shop();
         
         var _rain_chance = irandom(99); 
@@ -74,8 +75,8 @@ function advance_time(_hours) {
             // Sâu bệnh ĐÃ ĐƯỢC CHUYỂN XUỐNG CUỐI HÀM để không bị cộng dồn thời gian ngủ
             
             // Quả chín để qua đêm sẽ héo úa
-            if (plant_stage == 3) {
-                plant_stage = 4; // Hỏng luôn
+            if (plant_stage == 4) {
+                plant_stage = 5; // Hỏng luôn
                 effect_create_above(ef_smoke, x + 32, y + 32, 1, c_dkgray);
             }
         }
@@ -91,14 +92,23 @@ function advance_time(_hours) {
     }
     
     // Tự động cho cây trồng lớn lên tương ứng với số thời gian bỏ qua
-    var _frames_passed = _hours * 60 * frames_per_game_minute;
+    var _frames_passed = _hours * 60 * 5; // Luôn dùng 5 (tốc độ gốc) để chuẩn hóa thời gian cây lớn
     with (obj_dirt) {
-        if (plant_stage > 0 && plant_stage < 3) {
-            // Cỏ dại không làm ngừng lớn, nhưng sâu bệnh thì CÓ
-            if (is_watered == true && is_infected == false) {
+        if (plant_stage > 0 && plant_stage < 4) {
+            var _req_season = 0;
+            if (plant_type >= 9 && plant_type <= 12) _req_season = 0;
+            else if (plant_type >= 13 && plant_type <= 14) _req_season = 1;
+            else if (plant_type >= 15 && plant_type <= 16) _req_season = 2;
+            else if (plant_type == 17) _req_season = 3;
+            var _can_grow = (obj_game_manager.current_season == _req_season);
+
+            if (_can_grow == true && is_watered == true && is_infected == false) {
                 growth_timer += _frames_passed;
-                while (growth_timer >= growth_max && plant_stage < 3) {
+                while (growth_timer >= growth_max && plant_stage < 4) {
                     plant_stage += 1;
+                    if (plant_stage == 4 && has_weed == true) {
+                        is_neglected = true; // Bị hạ hạng do có cỏ dại lúc ra quả
+                    }
                     growth_timer -= growth_max;
                     rot_timer = 0;
                     
@@ -116,13 +126,11 @@ function advance_time(_hours) {
                 is_neglected = true;
                 rot_timer += _frames_passed;
                 if (rot_timer >= 3600) { // 12 tiếng để xịt thuốc
-                    plant_stage = 4;
+                    plant_stage = 5;
                 }
             }
             
-            if (has_weed == true) {
-                is_neglected = true;
-            }
+            // Bỏ kiểm tra cỏ dại liên tục ở đây
         } 
         // Đã xóa phần thối hỏng ở Giai đoạn 3 (khi có quả) vì đã xử lý ở trên (qua ngày)
     }
@@ -131,7 +139,7 @@ function advance_time(_hours) {
     // Thực hiện SAU KHI đã cộng thời gian để sâu mới sinh không bị chết ngay lập tức
     if (_days_passed > 0) {
         with (obj_dirt) {
-            if (plant_stage > 0 && plant_stage < 3) {
+            if (plant_stage > 0 && plant_stage < 4) {
                 if (irandom(100) < 20) is_infected = true;
             }
         }
@@ -159,18 +167,59 @@ audio_play_sound(snd_bgm, 0, true);
 }
 
 // ========================================================
-// KHO DỮ LIỆU VẬT PHẨM (ID từ 0 đến 12)
+// KHO DỮ LIỆU VẬT PHẨM
 // ========================================================
-item_names = ["Cuốc", "Bình Tưới", "Hạt Cà Chua", "Hạt Ngô", "Ghế Gỗ", "Chậu Hoa", "Đèn Lồng", "Cà Chua (Thường)", "Phân Bón", "Thuốc Sinh Học", "Cái Liềm", "Cà Chua (Hạng A)", "Cà Chua (Hạng B)"];
-item_prices = [0, 0, 5, 10, 50, 30, 100, 5, 8, 12, 15, 25, 2]; // Hạng B bán được thấp tiền nhất (2 xu)
-item_sprites = [spr_icon_hoe, spr_icon_water, spr_icon_tomato, spr_icon_corn, spr_icon_chair, spr_icon_pot, spr_icon_lantern, spr_crop_tomato, spr_icon_fertilizer, spr_icon_pesticide, spr_icon_sickle, spr_crop_tomato_a, spr_crop_tomato_b];
+item_names = [
+    "Cuốc", "Bình Tưới", "Cái Liềm", "Xẻng", "Phân Bón", "Thuốc Sinh Học", "Ghế Gỗ", "Chậu Hoa", "Đèn Lồng", 
+    "Hạt Củ Cải Vàng", "Hạt Súp Lơ Trắng", "Hạt Đậu Xanh", "Hạt Khoai Tây", 
+    "Hạt Việt Quất", "Hạt Dưa Hấu", 
+    "Hạt Bí Ngô", "Hạt Nho", 
+    "Hạt Khoai Mỡ",
+    "Củ Cải Vàng", "Súp Lơ Trắng", "Đậu Xanh", "Khoai Tây", 
+    "Việt Quất", "Dưa Hấu", 
+    "Bí Ngô", "Nho", 
+    "Khoai Mỡ"
+];
+item_prices = [
+    0, 0, 15, 0, 8, 12, 50, 30, 100, 
+    10, 15, 12, 10, 
+    20, 25, 
+    30, 35, 
+    40,
+    25, 35, 30, 25, 
+    45, 55, 
+    75, 80, 
+    100
+];
+item_sprites = [
+    spr_icon_hoe, spr_icon_water, spr_icon_sickle, spr_xeng, spr_icon_fertilizer, spr_icon_pesticide, spr_icon_chair, spr_icon_pot, spr_icon_lantern, 
+    spr_hat_cu_cai_vang, spr_hat_sup_lo_trang, spr_hat_dau_xanh, spr_hat_khoai_tay, 
+    spr_hat_viet_quat, spr_hat_dua_hau, 
+    spr_hat_bi_ngo, spr_hat_nho, 
+    spr_hat_khoai_mo,
+    spr_cu_cai_vang, spr_sup_lo_trang, spr_dau_xanh, spr_khoai_tay, 
+    spr_viet_quat, spr_dua_hau, 
+    spr_bi_ngo, spr_nho, 
+    spr_khoai_mo
+];
 
+current_season = ((day_count - 1) div 28) % 4; // 0=Xuân, 1=Hạ, 2=Thu, 3=Đông
 daily_shop = [0, 0, 0, 0, 0];
 
 function reset_shop() {
-for(var i = 0; i < 5; i++) {
-daily_shop[i] = choose(2, 3, 4, 5, 6, 8, 9, 10);
-}
+    for(var i = 0; i < 5; i++) {
+        var _season_seeds = [];
+        if (current_season == 0) _season_seeds = [9, 10, 11, 12];
+        else if (current_season == 1) _season_seeds = [13, 14];
+        else if (current_season == 2) _season_seeds = [15, 16];
+        else if (current_season == 3) _season_seeds = [17];
+        
+        // Random ra vật phẩm thường hoặc hạt giống theo mùa
+        var _choices = [4, 5, 6, 7, 8];
+        array_copy(_choices, array_length(_choices), _season_seeds, 0, array_length(_season_seeds));
+        
+        daily_shop[i] = _choices[irandom(array_length(_choices) - 1)];
+    }
 }
 
 reset_shop();

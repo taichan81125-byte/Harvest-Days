@@ -13,6 +13,9 @@ for(var i = 0; i < 4; i++) {
     }
 }
 
+// Cứng hóa slot 4 luôn là map Admin
+slot_names[3] = "Admin_farm";
+
 // 3. CÁC BIẾN QUẢN LÝ VIỆC GÕ BÀN PHÍM ĐỂ ĐẶT TÊN
 is_typing = false;
 typing_slot = -1;
