@@ -43,6 +43,7 @@
   "resources":[
     {"id":{"name":"fnt_vietnamese","path":"fonts/fnt_vietnamese/fnt_vietnamese.yy",},},
     {"id":{"name":"obj_bed","path":"objects/obj_bed/obj_bed.yy",},},
+    {"id":{"name":"obj_bg_house","path":"objects/obj_bg_house/obj_bg_house.yy",},},
     {"id":{"name":"obj_bin","path":"objects/obj_bin/obj_bin.yy",},},
     {"id":{"name":"obj_decoration","path":"objects/obj_decoration/obj_decoration.yy",},},
     {"id":{"name":"obj_dirt","path":"objects/obj_dirt/obj_dirt.yy",},},
