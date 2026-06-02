@@ -30,9 +30,13 @@
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"CaChuaHangB.png","CopyToMask":-1,"filePath":"datafiles","name":"CaChuaHangB.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Caykim.png","CopyToMask":-1,"filePath":"datafiles","name":"Caykim.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"dong.png","CopyToMask":-1,"filePath":"datafiles","name":"dong.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"ha.png","CopyToMask":-1,"filePath":"datafiles","name":"ha.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"house_interior.png","CopyToMask":-1,"filePath":"datafiles","name":"house_interior.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"khung.png","CopyToMask":-1,"filePath":"datafiles","name":"khung.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"Matdongho.png","CopyToMask":-1,"filePath":"datafiles","name":"Matdongho.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"thu.png","CopyToMask":-1,"filePath":"datafiles","name":"thu.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"xuan.png","CopyToMask":-1,"filePath":"datafiles","name":"xuan.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
