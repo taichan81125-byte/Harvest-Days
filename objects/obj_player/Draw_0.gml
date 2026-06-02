@@ -14,9 +14,12 @@ if (obj_game_manager.is_paused == false && _current_item != -1) {
     // Vẽ một ô vuông mờ
     draw_rectangle(mouse_tile_x, mouse_tile_y, mouse_tile_x + 63, mouse_tile_y + 63, false);
     
-    // Vẽ viền ngoài đậm hơn một chút
+    // Vẽ viền ngoài đậm hơn một chút (dùng 4 hcn để tránh lỗi lệch pixel của outline)
     draw_set_alpha(0.8);
-    draw_rectangle(mouse_tile_x, mouse_tile_y, mouse_tile_x + 63, mouse_tile_y + 63, true);
+    draw_rectangle(mouse_tile_x, mouse_tile_y, mouse_tile_x + 63, mouse_tile_y + 1, false);
+    draw_rectangle(mouse_tile_x, mouse_tile_y + 62, mouse_tile_x + 63, mouse_tile_y + 63, false);
+    draw_rectangle(mouse_tile_x, mouse_tile_y, mouse_tile_x + 1, mouse_tile_y + 63, false);
+    draw_rectangle(mouse_tile_x + 62, mouse_tile_y, mouse_tile_x + 63, mouse_tile_y + 63, false);
     
     draw_set_color(c_white);
     draw_set_alpha(1.0);
@@ -40,31 +43,31 @@ var _spr_h = sprite_get_height(_spr);
 var _spr_ox = sprite_get_xoffset(_spr);
 var _spr_oy = sprite_get_yoffset(_spr);
 
-// Tính offset để đưa "tâm thực" của sprite về đúng vị trí vẽ
-// (Bù trừ cho các sprite có origin ở góc 0,0 thay vì ở giữa)
-var _center_fix_x = (_spr_w / 2) - _spr_ox;
-var _center_fix_y = (_spr_h / 2) - _spr_oy;
-
 // ========================================================
-// TÙY CHỈNH ĐỘ TO NHỎ CHO TỪNG LOẠI ĐỒ VẬT
+// TÙY CHỈNH ĐỘ TO NHỎ CHO TỪNG LOẠI ĐỒ VẬT TỰ ĐỘNG THEO SIZE
 // ========================================================
-var _base_scale = 0.55; // Mặc định cho Công cụ
+var _max_dim = max(max(_spr_w, _spr_h), 1);
+var _base_scale = 1;
 
-if (_current_item == 7 || _current_item == 11 || _current_item == 12) {
-    // Quả Cà Chua -> Thu nhỏ lại cho vừa tay
-    _base_scale = 0.35;
+if (_current_item >= 18 && _current_item <= 26) {
+    // Nông sản
+    _base_scale = 16 / _max_dim;
 }
-else if (_current_item == 2 || _current_item == 3) {
-    // Hạt giống -> Cũng thu nhỏ lại cho vừa tay
-    _base_scale = 0.4;
+else if (_current_item >= 9 && _current_item <= 17) {
+    // Hạt giống
+    _base_scale = 16 / _max_dim;
 }
-else if (_current_item >= 4 && _current_item <= 6) {
+else if (_current_item >= 6 && _current_item <= 8) {
     // Đồ trang trí
-    _base_scale = 0.45;
+    _base_scale = 22 / _max_dim;
 }
-else if (_current_item == 8 || _current_item == 9) {
+else if (_current_item == 4 || _current_item == 5) {
     // Phân bón, Thuốc sinh học
-    _base_scale = 0.4;
+    _base_scale = 16 / _max_dim;
+}
+else {
+    // Công cụ (Cuốc, Bình tưới, Liềm, Xẻng)
+    _base_scale = 30 / _max_dim;
 }
 
 var _scale_x = _base_scale;
@@ -73,7 +76,7 @@ var _scale_y = _base_scale;
 // ========================================================
 // PHÂN LOẠI: CÔNG CỤ (xoay được) vs ĐỒ VẬT (không xoay)
 // ========================================================
-var _is_tool = (_current_item == 0 || _current_item == 1 || _current_item == 10);
+var _is_tool = (_current_item == 0 || _current_item == 1 || _current_item == 2 || _current_item == 3);
 
 // ========================================================
 // CHỈNH SỬA TỌA ĐỘ VÀ GÓC THEO HƯỚNG MẶT
@@ -128,10 +131,14 @@ else {
     }
 }
 
-// Bù trừ origin: đảm bảo sprite luôn được vẽ ở đúng tâm mong muốn
-// bất kể origin gốc của sprite đặt ở đâu (0,0 hay giữa)
-_item_x += _center_fix_x * abs(_scale_x);
-_item_y += _center_fix_y * abs(_scale_y);
+// Bù trừ origin + xoay: đảm bảo TÂM của sprite luôn nằm đúng tại _item_x, _item_y
+var _vec_x = ((_spr_w / 2) - _spr_ox) * _scale_x;
+var _vec_y = ((_spr_h / 2) - _spr_oy) * _scale_y;
+var _dist = point_distance(0, 0, _vec_x, _vec_y);
+var _dir = point_direction(0, 0, _vec_x, _vec_y);
+
+_item_x -= lengthdir_x(_dist, _dir + _angle);
+_item_y -= lengthdir_y(_dist, _dir + _angle);
 
 // 3. VẼ THEO THỨ TỰ TRƯỚC-SAU ĐỂ TRÁNH LỖI ĐÈ HÌNH
 if (facing_dir == 90) {

@@ -40,10 +40,12 @@ for(var i = 0; i < 4; i++) {
             draw_text(_start_x + 20, _btn_y + 60, "Đã chơi: " + string(slot_days[i]) + " ngày");
             
             // Vẽ Nút XÓA (Màu Đỏ bên phải)
-            draw_set_color(c_red);
-            draw_rectangle(_start_x + 500, _btn_y + 25, _start_x + 580, _btn_y + 75, false);
-            draw_set_color(c_white);
-            draw_text(_start_x + 518, _btn_y + 40, "XÓA");
+            if (i != 3) {
+                draw_set_color(c_red);
+                draw_rectangle(_start_x + 500, _btn_y + 25, _start_x + 580, _btn_y + 75, false);
+                draw_set_color(c_white);
+                draw_text(_start_x + 518, _btn_y + 40, "XÓA");
+            }
         }
     }
 }

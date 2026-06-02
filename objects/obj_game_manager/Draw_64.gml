@@ -172,7 +172,7 @@ for(var i = 0; i < 5; i++) {
     
     if (_item_id != -1) {
         var _price = item_prices[_item_id]; var _spr = item_sprites[_item_id]; 
-        draw_sprite(_spr, 0, _btn_x + 18, _btn_y + 18);
+        draw_sprite_stretched(_spr, 0, _btn_x + 18, _btn_y + 18, 64, 64);
         if (_item_id == 2 || _item_id == 3) {
             draw_set_color(c_yellow); draw_set_halign(fa_right); draw_text(_btn_x + 95, _btn_y + 75, "x5"); draw_set_halign(fa_left); draw_set_color(c_white);
         }
