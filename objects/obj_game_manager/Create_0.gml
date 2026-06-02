@@ -1,3 +1,9 @@
+// Tránh tạo bản sao khi quay lại phòng có game_manager trong Room Editor
+if (instance_number(obj_game_manager) > 1) {
+    instance_destroy();
+    exit;
+}
+
 // Đổi con trỏ chuột sang sprite mới và ẩn con trỏ chuột hệ thống
 cursor_sprite = spr_mouse;
 window_set_cursor(cr_none);
@@ -35,6 +41,12 @@ sprite_set_offset(spr_kim_dong_ho, 225, 245);
 
 // Tải sprite Cà Chua Hạng B (Làm tối từ Cà Chua thường)
 spr_crop_tomato_b = sprite_add(working_directory + "CaChuaHangB.png", 1, false, false, 0, 0);
+
+// Tải hình nền nhà nông dân
+global.spr_house_bg = sprite_add(working_directory + "house_interior.png", 1, false, false, 0, 0);
+if (global.spr_house_bg == -1) {
+    show_debug_message("CẢNH BÁO: Không tìm thấy file house_interior.png trong thư mục datafiles!");
+}
 
 function advance_time(_hours) {
     game_hour += _hours;
@@ -148,7 +160,7 @@ audio_master_gain(global.master_vol);
 }
 
 // Bật nhạc nền lặp đi lặp lại (Loop) khi vào phòng Nông trại
-if (room == rm_farm) {
+if (room == rm_farm || room == rm_house) {
 if (!audio_is_playing(snd_bgm)) {
 audio_play_sound(snd_bgm, 0, true);
 }
@@ -237,18 +249,21 @@ ini_write_real("Game", "day_count", day_count);
 ini_write_real("Game", "game_hour", game_hour);
 ini_write_real("Game", "game_minute", game_minute);
 
-with (obj_dirt) {
-    var _key = "Dirt_" + string(x) + "_" + string(y);
-    ini_write_real(_key, "state", state);
-    ini_write_real(_key, "is_watered", is_watered);
-    ini_write_real(_key, "is_fertilized", is_fertilized);
-    ini_write_real(_key, "is_infected", is_infected);
-    ini_write_real(_key, "has_weed", has_weed);
-    ini_write_real(_key, "is_neglected", is_neglected);
-    ini_write_real(_key, "plant_stage", plant_stage);
-    ini_write_real(_key, "plant_type", plant_type);
-    ini_write_real(_key, "growth_timer", growth_timer);
-    ini_write_real(_key, "rot_timer", rot_timer);
+// Chỉ lưu dữ liệu đất khi ở nông trại (obj_dirt chỉ tồn tại ở rm_farm)
+if (room == rm_farm) {
+    with (obj_dirt) {
+        var _key = "Dirt_" + string(x) + "_" + string(y);
+        ini_write_real(_key, "state", state);
+        ini_write_real(_key, "is_watered", is_watered);
+        ini_write_real(_key, "is_fertilized", is_fertilized);
+        ini_write_real(_key, "is_infected", is_infected);
+        ini_write_real(_key, "has_weed", has_weed);
+        ini_write_real(_key, "is_neglected", is_neglected);
+        ini_write_real(_key, "plant_stage", plant_stage);
+        ini_write_real(_key, "plant_type", plant_type);
+        ini_write_real(_key, "growth_timer", growth_timer);
+        ini_write_real(_key, "rot_timer", rot_timer);
+    }
 }
 
 ini_close();
@@ -276,18 +291,21 @@ if (file_exists(_file_name)) {
     game_hour = ini_read_real("Game", "game_hour", 6);
     game_minute = ini_read_real("Game", "game_minute", 0);
 
-    with (obj_dirt) {
-        var _key = "Dirt_" + string(x) + "_" + string(y);
-        state = ini_read_real(_key, "state", 0);
-        is_watered = ini_read_real(_key, "is_watered", 0);
-        is_fertilized = ini_read_real(_key, "is_fertilized", 0);
-        is_infected = ini_read_real(_key, "is_infected", 0);
-        has_weed = ini_read_real(_key, "has_weed", 0);
-        is_neglected = ini_read_real(_key, "is_neglected", 0);
-        plant_stage = ini_read_real(_key, "plant_stage", 0);
-        plant_type = ini_read_real(_key, "plant_type", -1);
-        growth_timer = ini_read_real(_key, "growth_timer", 0);
-        rot_timer = ini_read_real(_key, "rot_timer", 0);
+    // Chỉ tải dữ liệu đất khi ở nông trại
+    if (room == rm_farm) {
+        with (obj_dirt) {
+            var _key = "Dirt_" + string(x) + "_" + string(y);
+            state = ini_read_real(_key, "state", 0);
+            is_watered = ini_read_real(_key, "is_watered", 0);
+            is_fertilized = ini_read_real(_key, "is_fertilized", 0);
+            is_infected = ini_read_real(_key, "is_infected", 0);
+            has_weed = ini_read_real(_key, "has_weed", 0);
+            is_neglected = ini_read_real(_key, "is_neglected", 0);
+            plant_stage = ini_read_real(_key, "plant_stage", 0);
+            plant_type = ini_read_real(_key, "plant_type", -1);
+            growth_timer = ini_read_real(_key, "growth_timer", 0);
+            rot_timer = ini_read_real(_key, "rot_timer", 0);
+        }
     }
 
     ini_close();

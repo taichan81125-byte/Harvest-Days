@@ -1,3 +1,9 @@
+// Tránh tạo bản sao khi quay lại phòng có player trong Room Editor
+if (instance_number(obj_player) > 1) {
+    instance_destroy();
+    exit;
+}
+
 // --- DI CHUYỂN VÀ HƯỚNG MẶT ---
 move_speed = 4;
 base_speed = 4;     // Lưu lại tốc độ gốc để thay đổi khi bị đói

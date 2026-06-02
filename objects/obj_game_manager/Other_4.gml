@@ -2,6 +2,13 @@
 // BƯỚC ĐỆM LOAD GAME LÚC VỪA VÀO PHÒNG (SAU KHI CHỌN SLOT)
 // ========================================================
 
+// Chỉ chạy logic load/init khi vào rm_farm
+if (room != rm_farm) exit;
+
+// Tránh chạy lại khi quay về rm_farm từ rm_house (persistent object)
+if (variable_instance_exists(id, "game_initialized") && game_initialized == true) exit;
+game_initialized = true;
+
 // LỚP BẢO VỆ: Nếu test game chạy thẳng vào rm_farm mà chưa qua Menu
 if (!variable_global_exists("is_new_game")) {
     global.is_new_game = true;

@@ -161,6 +161,8 @@ if (_is_ui_open == false) {
     }
     y += _vspd;
 
+
+
 }
 
 // ==========================================
@@ -232,6 +234,15 @@ var _target_shop = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, ob
 var _target_table = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_table, false, true);
 var _target_deco = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_decoration, false, true);
 var _target_solid = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_solid, false, true);
+
+if (keyboard_check_pressed(vk_space)) {
+    if (_target_bed == noone) {
+        _target_bed = collision_circle(x, y, 96, obj_bed, false, true);
+    }
+    if (_target_bed != noone) {
+        is_mouse_in_reach = true;
+    }
+}
 
 var _current_item = -1;
 if (selected_slot != -1) _current_item = inventory[selected_slot]; 
