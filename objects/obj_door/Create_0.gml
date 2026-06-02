@@ -3,8 +3,8 @@
 // ==========================================
 // Mặc định: quay về nông trại (khi thoát khỏi nhà)
 target_room = rm_farm;
-target_x = 2336;    // Vị trí spawn trên rm_farm (trước cửa nhà)
-target_y = 1408;
+target_x = 2462;    // Vị trí spawn ngay trước cửa nhà ở rm_farm
+target_y = 1550;
 
 // Ẩn cửa (chỉ dùng collision mask để phát hiện player)
 image_alpha = 0;

@@ -3,7 +3,7 @@ draw_set_font(fnt_vietnamese);
 // ==========================================
 // HIỆU ỨNG ÁNH SÁNG NGÀY/ĐÊM (VẼ TRƯỚC TIÊN ĐỂ KHÔNG ĐÈ LÊN UI)
 // ==========================================
-if ((room == rm_farm || room == rm_house) && day_overlay_alpha > 0) {
+if ((room == rm_farm || room == rm_house || room == rm_city) && day_overlay_alpha > 0) {
     draw_set_color(day_overlay_color);
     draw_set_alpha(day_overlay_alpha);
     // Hardcode kích thước GUI là 1280x720 cho chắc chắn
@@ -14,7 +14,7 @@ if (instance_exists(obj_player)) {
 draw_set_color(c_yellow);
 draw_text(20, 20, "Tiền (Coins): " + string(obj_player.coins));
 
-if (room == rm_farm || room == rm_house) {
+if (room == rm_farm || room == rm_house || room == rm_city) {
     // Kéo các UI như tim và thức ăn sang trái một chút (về tọa độ 950) để nhường chỗ cho Đồng hồ
     var _ui_right_x = 950; 
     
@@ -90,6 +90,68 @@ if (room == rm_farm || room == rm_house) {
     }
 } 
 
+    // ==========================================
+    // VẼ MINIMAP (BẢN ĐỒ THU NHỎ) - CHỈ Ở FARM & CITY
+    // ==========================================
+    if (room == rm_farm || room == rm_city) {
+        var _mm_x = 20;
+        var _mm_y = 60;
+        var _mm_w = 200;
+        var _mm_h = 150;
+        
+        // 1. Xác định map cần vẽ
+        var _map_spr = -1;
+        if (room == rm_farm) {
+            _map_spr = season_map_sprites[current_season];
+        } else if (room == rm_city) {
+            // Kiểm tra xem mảng city có được khởi tạo chưa (đề phòng lỗi)
+            if (variable_instance_exists(id, "season_city_sprites")) {
+                _map_spr = season_city_sprites[current_season];
+            }
+        }
+        
+        // 2. Vẽ hình nền bản đồ
+        if (_map_spr != -1) {
+            draw_sprite_stretched(_map_spr, 0, _mm_x, _mm_y, _mm_w, _mm_h);
+        } else {
+            draw_set_color(c_black); draw_set_alpha(0.5);
+            draw_rectangle(_mm_x, _mm_y, _mm_x + _mm_w, _mm_y + _mm_h, false); draw_set_alpha(1.0);
+        }
+        
+        // 3. Vẽ viền bản đồ thu nhỏ
+        draw_set_color(c_white);
+        draw_rectangle(_mm_x, _mm_y, _mm_x + _mm_w, _mm_y + _mm_h, true);
+        
+        // 4. Vẽ khung camera hiện tại
+        var _cam = view_camera[0];
+        var _cam_x = camera_get_view_x(_cam);
+        var _cam_y = camera_get_view_y(_cam);
+        var _cam_w = camera_get_view_width(_cam);
+        var _cam_h = camera_get_view_height(_cam);
+        
+        // Tỉ lệ (scale)
+        var _rw = room_width;
+        var _rh = room_height;
+        if (_rw == 0) _rw = 4000;
+        if (_rh == 0) _rh = 3000;
+        var _sx = _mm_w / _rw;
+        var _sy = _mm_h / _rh;
+        
+        var _rect_x = _mm_x + (_cam_x * _sx);
+        var _rect_y = _mm_y + (_cam_y * _sy);
+        var _rect_w = _cam_w * _sx;
+        var _rect_h = _cam_h * _sy;
+        
+        // Vẽ khung nhìn (khung màu vàng)
+        draw_set_color(c_yellow);
+        draw_rectangle(_rect_x, _rect_y, _rect_x + _rect_w, _rect_y + _rect_h, true);
+        
+        // Vẽ vị trí người chơi (chấm nhỏ màu đỏ)
+        var _px = _mm_x + (obj_player.x * _sx);
+        var _py = _mm_y + (obj_player.y * _sy);
+        draw_set_color(c_red);
+        draw_circle(_px, _py, 3, false);
+    }
 
 }
 
