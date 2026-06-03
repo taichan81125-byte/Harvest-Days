@@ -1,5 +1,5 @@
-// 1. Vẽ hình nền menu mới (trải rộng full màn hình)
-draw_sprite_stretched(spr_nen_game, 0, 0, 0, 1280, 720);
+// 1. Vẽ hình nền menu mới (trải rộng full màn hình, cắt bỏ viền trong suốt ở 2 bên)
+draw_sprite_part_ext(spr_nen_game, 0, 20, 0, 600, 360, 0, 0, 1280/600, 720/360, c_white, 1);
 
 // BẮT BUỘC TRẢ LẠI CĂN LỀ TRÁI/TRÊN NHƯ MẶC ĐỊNH (Để không làm hỏng UI trong game)
 draw_set_halign(fa_left);
