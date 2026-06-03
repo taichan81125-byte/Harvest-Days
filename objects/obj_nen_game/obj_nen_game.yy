@@ -1,15 +1,13 @@
 {
   "$GMObject":"",
-  "%Name":"obj_npc_moc",
-  "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+  "%Name":"obj_nen_game",
+  "eventList":[],
   "managed":true,
-  "name":"obj_npc_moc",
+  "name":"obj_nen_game",
   "overriddenProperties":[],
   "parent":{
-    "name":"Characters",
-    "path":"folders/Objects/Characters.yy",
+    "name":"HarvestDays",
+    "path":"HarvestDays.yyp",
   },
   "parentObjectId":null,
   "persistent":false,
@@ -29,10 +27,7 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":{
-    "name":"spr_npc_moc",
-    "path":"sprites/spr_npc_moc/spr_npc_moc.yy",
-  },
+  "spriteId":null,
   "spriteMaskId":null,
   "visible":true,
 }

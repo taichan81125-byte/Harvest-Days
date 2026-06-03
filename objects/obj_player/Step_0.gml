@@ -176,12 +176,19 @@ if (obj_game_manager.show_shop == true && obj_game_manager.is_paused == false) {
     if (mouse_check_button_pressed(mb_left)) {
         var _mx = device_mouse_x_to_gui(0);
         var _my = device_mouse_y_to_gui(0);
+        
+        // Tọa độ shop trùng với Draw_64
+        var _shop_x = 200, _shop_y = 100, _shop_w = 880, _shop_h = 500;
+        var _sx = _shop_w / 640;
+        var _sy = _shop_h / 360;
 
-        for(var i = 0; i < 5; i++) {
-            var _btn_x = 250 + (i * 150);
-            var _btn_y = 250;
+        for(var i = 0; i < 4; i++) {
+            var _slot_x = _shop_x + (128 + i * 105) * _sx;
+            var _slot_y = _shop_y + 72 * _sy;
+            var _slot_w = 88 * _sx;
+            var _slot_h = 120 * _sy;
             
-            if (_mx >= _btn_x && _mx <= _btn_x + 100 && _my >= _btn_y && _my <= _btn_y + 100) {
+            if (_mx >= _slot_x && _mx <= _slot_x + _slot_w && _my >= _slot_y && _my <= _slot_y + _slot_h) {
                 var _item_id = obj_game_manager.daily_shop[i];
                 
                 if (_item_id != -1) { 
@@ -193,11 +200,20 @@ if (obj_game_manager.show_shop == true && obj_game_manager.is_paused == false) {
                         if (add_item(_item_id, _buy_count)) {
                             coins -= _price;
                             obj_game_manager.daily_shop[i] = -1; 
-                            audio_play_sound(snd_coin, 1, false); // PHÁT ÂM THANH MUA HÀNG
+                            audio_play_sound(snd_coin, 1, false);
                         }
                     }
                 }
             }
+        }
+        
+        // Nhấn nút Exit (tọa độ gốc ~455,275, kích thước ~80x30)
+        var _exit_x = _shop_x + 455 * _sx;
+        var _exit_y = _shop_y + 275 * _sy;
+        var _exit_w = 80 * _sx;
+        var _exit_h = 30 * _sy;
+        if (_mx >= _exit_x && _mx <= _exit_x + _exit_w && _my >= _exit_y && _my <= _exit_y + _exit_h) {
+            obj_game_manager.show_shop = false;
         }
     }
     if (keyboard_check_pressed(vk_space)) obj_game_manager.show_shop = false;

@@ -141,10 +141,10 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
     draw_set_halign(fa_left); draw_set_valign(fa_top);
 
     // 7. Thời tiết và Mùa (Nằm cạnh ổ khóa !)
-    var _spr_season = spr_icon_mua_xuan;
-    if (current_season == 1) _spr_season = spr_icon_mua_ha;
-    if (current_season == 2) _spr_season = spr_icon_mua_thu;
-    if (current_season == 3) _spr_season = spr_icon_mua_dong;
+    var _spr_season = spr_icon_mua_ha;
+    if (current_season == 1) _spr_season = spr_icon_mua_thu;
+    if (current_season == 2) _spr_season = spr_icon_mua_dong;
+    if (current_season == 3) _spr_season = spr_icon_mua_xuan;
     var _spr_weather = is_raining ? spr_icon_troi_mua : spr_icon_troi_nang;
     
     var _icon_scale = 0.35; // Thu bé đi 30%
@@ -408,31 +408,46 @@ draw_set_color(c_yellow); draw_text(1000, 640, "[Nhấn SPACE để đóng]");
 }
 
 if (show_shop == true && is_paused == false) {
-draw_set_color(c_black); draw_set_alpha(0.8); draw_rectangle(200, 100, 1080, 600, false);
-draw_set_alpha(1.0); draw_set_color(c_white); draw_rectangle(200, 100, 1080, 600, true);
-draw_text(450, 130, "--- CỬA HÀNG HÔM NAY ---");
+// Vẽ nền cửa hàng bằng sprite spr_nen_shop (gốc 640x360)
+var _shop_x = 200, _shop_y = 100, _shop_w = 880, _shop_h = 500;
+draw_sprite_stretched(spr_nen_shop, 0, _shop_x, _shop_y, _shop_w, _shop_h);
 
-var _start_x = 250; var _btn_y = 250;
-for(var i = 0; i < 5; i++) {
+// Tỉ lệ scale từ sprite gốc 640x360 sang 880x500
+var _sx = _shop_w / 640;
+var _sy = _shop_h / 360;
+
+// Tọa độ 4 ô slot trong sprite gốc (ước lượng): x≈128, y≈72, w≈88, h≈120, khoảng cách≈105
+for(var i = 0; i < 4; i++) {
     var _item_id = daily_shop[i];
-    var _btn_x = _start_x + (i * 150); 
-    
-    draw_set_color(c_dkgray); draw_rectangle(_btn_x, _btn_y, _btn_x + 100, _btn_y + 100, false);
-    draw_set_color(c_white); draw_rectangle(_btn_x, _btn_y, _btn_x + 100, _btn_y + 100, true);
+    // Tọa độ slot trên GUI
+    var _slot_x = _shop_x + (128 + i * 105) * _sx;
+    var _slot_y = _shop_y + 72 * _sy;
+    var _slot_w = 88 * _sx;
+    var _slot_h = 120 * _sy;
     
     if (_item_id != -1) {
         var _price = item_prices[_item_id]; var _spr = item_sprites[_item_id]; 
-        draw_sprite_stretched(_spr, 0, _btn_x + 18, _btn_y + 18, 64, 64);
+        // Vẽ icon vật phẩm căn giữa trong ô
+        var _icon_size = min(_slot_w, _slot_h) * 0.55;
+        var _icon_x = _slot_x + (_slot_w - _icon_size) / 2;
+        var _icon_y = _slot_y + (_slot_h - _icon_size) / 2 - 10;
+        draw_sprite_stretched(_spr, 0, _icon_x, _icon_y, _icon_size, _icon_size);
         if (_item_id == 2 || _item_id == 3) {
-            draw_set_color(c_yellow); draw_set_halign(fa_right); draw_text(_btn_x + 95, _btn_y + 75, "x5"); draw_set_halign(fa_left); draw_set_color(c_white);
+            draw_set_color(c_yellow); draw_set_halign(fa_right); 
+            draw_text(_slot_x + _slot_w - 5, _slot_y + _slot_h - 40, "x5"); 
+            draw_set_halign(fa_left); draw_set_color(c_white);
         }
-        draw_text(_btn_x + 10, _btn_y + 110, string(_price) + " Vàng");
+        // Giá tiền bên dưới ô
+        draw_set_color(make_color_rgb(120, 60, 10));
+        draw_set_halign(fa_center);
+        draw_text(_slot_x + _slot_w / 2, _slot_y + _slot_h + 5, string(_price) + " V");
+        draw_set_halign(fa_left); draw_set_color(c_white);
     } else {
-        draw_set_color(c_gray); draw_text(_btn_x + 15, _btn_y + 40, "Đã Bán"); draw_set_color(c_white);
+        draw_set_color(make_color_rgb(120, 60, 10)); draw_set_halign(fa_center);
+        draw_text(_slot_x + _slot_w / 2, _slot_y + _slot_h / 2, "Đã Bán"); 
+        draw_set_halign(fa_left); draw_set_color(c_white);
     }
 }
-draw_set_color(c_yellow); draw_text(450, 550, "[Nhấn SPACE để đóng]");
-
 
 }
 

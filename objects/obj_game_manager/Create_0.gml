@@ -25,7 +25,7 @@ drag_src_type = -1; // 0: hotbar, 1: bag
 drag_src_index = -1;
 
 // Nội dung bức thư của Bác Mộc đã có Tiếng Việt
-dialogue_text = "Chào cháu, người bạn trẻ!\nKhu vườn này đang ngủ say, ta tin cháu có thể đánh thức nó.\nHãy lấy các dụng cụ trên chiếc bàn bên cạnh để bắt đầu công việc nhé.\nChúc cháu may mắn với Ngày Thu Hoạch!";
+dialogue_text = "Chào cháu, người bạn trẻ!\nKhu vườn này đang ngủ say, ta tin cháu có thể đánh thức nó.\nHãy lấy các dụng cụ ở chiếc hòm trong nhà để bắt đầu công việc nhé.\nChúc cháu may mắn với Ngày Thu Hoạch!";
 
 // Biến bật/tắt UI cửa hàng
 show_shop = false;
@@ -302,7 +302,7 @@ item_sprites = [
 ];
 
 current_season = ((day_count - 1) div 28) % 4; // 0=Xuân, 1=Hạ, 2=Thu, 3=Đông
-daily_shop = [0, 0, 0, 0, 0];
+daily_shop = [0, 0, 0, 0];
 
 // Biến chuyển mùa mượt mà (crossfade transition)
 season_transition_active = false;
@@ -318,7 +318,7 @@ max_particles = 40;
 particle_spawn_timer = 0;
 
 function reset_shop() {
-    for(var i = 0; i < 5; i++) {
+    for(var i = 0; i < 4; i++) {
         var _season_seeds = [];
         if (current_season == 0) _season_seeds = [9, 10, 11, 12];
         else if (current_season == 1) _season_seeds = [13, 14];
