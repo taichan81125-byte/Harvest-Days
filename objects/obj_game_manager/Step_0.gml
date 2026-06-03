@@ -25,13 +25,6 @@ if (is_paused == false && (room == rm_farm || room == rm_house || room == rm_cit
                     _infected_count++;
                 }
             }
-            if (_weed_count > 0) {
-                show_notifications = true;
-            }
-            if (_infected_count > 0) {
-                show_notifications = true;
-            }
-            
             if (game_hour == 6) {
                 night_events = []; // Xóa log báo cáo mỗi sáng
             }

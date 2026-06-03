@@ -222,6 +222,7 @@ var _target_shop = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, ob
 var _target_table = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_table, false, true);
 var _target_deco = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_decoration, false, true);
 var _target_solid = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_solid, false, true);
+var _target_soil_area = collision_circle(mouse_tile_x + 32, mouse_tile_y + 32, 10, obj_soil_area, false, true);
 
 if (keyboard_check_pressed(vk_space)) {
     if (_target_bed == noone) {
@@ -236,7 +237,7 @@ var _current_item = -1;
 if (selected_slot != -1) _current_item = inventory[selected_slot]; 
 
 if (_current_item == 0) { // Cuốc
-    if (_target_solid == noone && _target_dirt == noone && _target_bed == noone && _target_bin == noone && _target_shop == noone && _target_table == noone && _target_npc == noone) is_action_valid = true;
+    if (_target_soil_area != noone && _target_solid == noone && _target_dirt == noone && _target_bed == noone && _target_bin == noone && _target_shop == noone && _target_table == noone && _target_npc == noone) is_action_valid = true;
 } else if (_current_item == 1) { // Bình tưới
     if (_target_dirt != noone && _target_dirt.state == 1) is_action_valid = true;
 } else if (_current_item >= 9 && _current_item <= 17) { // Hạt giống

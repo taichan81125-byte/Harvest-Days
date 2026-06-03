@@ -1,3 +1,4 @@
+depth = 99;
 state = 0; // 0: Khô, 1: Đã Cuốc
 is_watered = false;
 is_fertilized = false;
