@@ -63,3 +63,22 @@ else {
 
 // Cập nhật lại tốc độ thời gian cho đúng với từng save slot
 frames_per_game_minute = (global.current_save_file == "slot4.ini") ? 2 : 5;
+
+// Khôi phục đất cuốc khi vào lại rm_farm
+if (room == rm_farm) {
+    with (obj_dirt) instance_destroy();
+    for (var i = 0; i < array_length(farm_dirt_data); i++) {
+        var _d = farm_dirt_data[i];
+        var _inst = instance_create_layer(_d._x, _d._y, "Instances", obj_dirt);
+        _inst.state = _d._state;
+        _inst.is_watered = _d._is_watered;
+        _inst.is_fertilized = _d._is_fertilized;
+        _inst.is_infected = _d._is_infected;
+        _inst.has_weed = _d._has_weed;
+        _inst.is_neglected = _d._is_neglected;
+        _inst.plant_stage = _d._plant_stage;
+        _inst.plant_type = _d._plant_type;
+        _inst.growth_timer = _d._growth_timer;
+        _inst.rot_timer = _d._rot_timer;
+    }
+}

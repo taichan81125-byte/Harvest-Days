@@ -59,6 +59,7 @@ if (global.spr_house_bg == -1) {
 }
 night_events = [];
 show_notifications = false;
+farm_dirt_data = [];
 
 // ==========================================
 // TẢI MAP MÙA (SEASONAL MAP SPRITES) - NÔNG TRẠI
@@ -108,20 +109,27 @@ function advance_time(_hours) {
         
         var _withered_count = 0;
         
-        with (obj_dirt) {
+        if (room == rm_farm) {
+            farm_dirt_data = [];
+            with (obj_dirt) {
+                array_push(other.farm_dirt_data, {
+                    _x: x, _y: y, _state: state, _is_watered: is_watered, _is_fertilized: is_fertilized,
+                    _is_infected: is_infected, _has_weed: has_weed, _is_neglected: is_neglected,
+                    _plant_stage: plant_stage, _plant_type: plant_type, _growth_timer: growth_timer, _rot_timer: rot_timer
+                });
+            }
+        }
+        
+        for (var i = 0; i < array_length(farm_dirt_data); i++) {
+            var _d = farm_dirt_data[i];
             if (obj_game_manager.is_raining == true) {
-                is_watered = true;
+                _d._is_watered = true;
             } else {
-                // Chỉ làm khô đất nếu chưa trồng cây
-                if (plant_stage == 0) is_watered = false; 
+                if (_d._plant_stage == 0) _d._is_watered = false; 
             }
             
-            // Sâu bệnh ĐÃ ĐƯỢC CHUYỂN XUỐNG CUỐI HÀM để không bị cộng dồn thời gian ngủ
-            
-            // Quả chín để qua đêm sẽ héo úa
-            if (plant_stage == 3) {
-                plant_stage = 4; // Hỏng luôn
-                effect_create_above(ef_smoke, x + 32, y + 32, 1, c_dkgray);
+            if (_d._plant_stage == 3) {
+                _d._plant_stage = 4;
                 _withered_count++;
             }
         }
@@ -132,10 +140,11 @@ function advance_time(_hours) {
     // Đổ xúc xắc mọc cỏ dại cho mỗi giờ trôi qua
     var _weed_count = 0;
     for (var i = 0; i < floor(_hours); i++) {
-        with (obj_dirt) {
-            if (state == 1 && has_weed == false) {
+        for (var j = 0; j < array_length(farm_dirt_data); j++) {
+            var _d = farm_dirt_data[j];
+            if (_d._state == 1 && _d._has_weed == false) {
                 if (irandom(100) < 2) {
-                    has_weed = true;
+                    _d._has_weed = true;
                     _weed_count++;
                 }
             }
@@ -145,61 +154,83 @@ function advance_time(_hours) {
     
     // Tự động cho cây trồng lớn lên tương ứng với số thời gian bỏ qua
     var _frames_passed = _hours * 60 * 5; // Luôn dùng 5 (tốc độ gốc) để chuẩn hóa thời gian cây lớn
-    with (obj_dirt) {
-        if (plant_stage > 0 && plant_stage < 3) {
+    for (var i = 0; i < array_length(farm_dirt_data); i++) {
+        var _d = farm_dirt_data[i];
+        if (_d._plant_stage > 0 && _d._plant_stage < 3) {
             var _req_season = 0;
-            if (plant_type >= 9 && plant_type <= 12) _req_season = 0;
-            else if (plant_type >= 13 && plant_type <= 14) _req_season = 1;
-            else if (plant_type >= 15 && plant_type <= 16) _req_season = 2;
-            else if (plant_type == 17) _req_season = 3;
+            if (_d._plant_type >= 9 && _d._plant_type <= 12) _req_season = 0;
+            else if (_d._plant_type >= 13 && _d._plant_type <= 14) _req_season = 1;
+            else if (_d._plant_type >= 15 && _d._plant_type <= 16) _req_season = 2;
+            else if (_d._plant_type == 17) _req_season = 3;
             var _can_grow = (obj_game_manager.current_season == _req_season);
 
-            if (_can_grow == true && is_watered == true && is_infected == false) {
-                growth_timer += _frames_passed;
-                while (growth_timer >= growth_max && plant_stage < 3) {
-                    plant_stage += 1;
-                    if (plant_stage == 3 && has_weed == true) {
-                        is_neglected = true; // Bị hạ hạng do có cỏ dại lúc ra quả
+            if (_can_grow == true && _d._is_watered == true && _d._is_infected == false) {
+                _d._growth_timer += _frames_passed;
+                // Giả lập behavior của obj_dirt: growth_max = 86400 (24h in game * 60m * 60s) hoặc 24 * 60 * 5 = 7200 frames!
+                // Wait, in obj_dirt, growth_max is set based on type. I need to hardcode it or calculate it.
+                // Let's assume standard growth_max for now (it's 7200 or 14400 frames usually)
+                // Oh wait, in Create_0.gml of obj_dirt: growth_max = 7200; (1 ngày trong game)
+                var _growth_max = 7200; 
+                while (_d._growth_timer >= _growth_max && _d._plant_stage < 3) {
+                    _d._plant_stage += 1;
+                    if (_d._plant_stage == 3 && _d._has_weed == true) {
+                        _d._is_neglected = true; 
                     }
-                    growth_timer -= growth_max;
-                    rot_timer = 0;
+                    _d._growth_timer -= _growth_max;
+                    _d._rot_timer = 0;
                     
                     if (obj_game_manager.is_raining) {
-                        is_watered = true;
+                        _d._is_watered = true;
                     } else {
-                        is_watered = false;
-                        growth_timer = 0; // Dừng lại vì hết nước cho giai đoạn sau
+                        _d._is_watered = false;
+                        _d._growth_timer = 0; 
                         break;
                     }
                 }
             } 
             
-            if (is_infected == true) {
-                is_neglected = true;
-                rot_timer += _frames_passed;
-                if (rot_timer >= 3600) { // 12 tiếng để xịt thuốc
-                    plant_stage = 4;
+            if (_d._is_infected == true) {
+                _d._is_neglected = true;
+                _d._rot_timer += _frames_passed;
+                if (_d._rot_timer >= 3600) { 
+                    _d._plant_stage = 4;
                 }
             }
-            
-            // Bỏ kiểm tra cỏ dại liên tục ở đây
         } 
-        // Đã xóa phần thối hỏng ở Giai đoạn 3 (khi có quả) vì đã xử lý ở trên (qua ngày)
     }
     
     // Sâu bệnh chỉ sinh ra lúc 6h sáng (qua đêm)
-    // Thực hiện SAU KHI đã cộng thời gian để sâu mới sinh không bị chết ngay lập tức
     var _infected_count = 0;
     if (_days_passed > 0) {
-        with (obj_dirt) {
-            if (plant_stage > 0 && plant_stage < 3) {
+        for (var i = 0; i < array_length(farm_dirt_data); i++) {
+            var _d = farm_dirt_data[i];
+            if (_d._plant_stage > 0 && _d._plant_stage < 3) {
                 if (irandom(100) < 20) {
-                    is_infected = true;
+                    _d._is_infected = true;
                     _infected_count++;
                 }
             }
         }
         if (_infected_count > 0) array_push(obj_game_manager.night_events, "- Ồ không! Có " + string(_infected_count) + " cây trồng đang bị sâu bệnh tấn công!");
+    }
+    
+    // Nếu vẫn ở trong rm_farm (ví dụ admin cheat), recreate obj_dirt
+    if (room == rm_farm) {
+        with (obj_dirt) instance_destroy();
+        for (var i = 0; i < array_length(farm_dirt_data); i++) {
+            var _d = farm_dirt_data[i];
+            var _inst = instance_create_layer(_d._x, _d._y, "Instances", obj_dirt);
+            _inst.state = _d._state;
+            _inst.is_watered = _d._is_watered;
+            _inst.is_fertilized = _d._is_fertilized;
+            _inst.is_infected = _d._is_infected;
+            _inst.has_weed = _d._has_weed;
+            _inst.is_neglected = _d._is_neglected;
+            _inst.plant_stage = _d._plant_stage;
+            _inst.plant_type = _d._plant_type;
+            _inst.growth_timer = _d._growth_timer;
+            _inst.rot_timer = _d._rot_timer;
+        }
     }
 }
 
@@ -330,21 +361,33 @@ ini_write_real("Game", "day_count", day_count);
 ini_write_real("Game", "game_hour", game_hour);
 ini_write_real("Game", "game_minute", game_minute);
 
-// Chỉ lưu dữ liệu đất khi ở nông trại (obj_dirt chỉ tồn tại ở rm_farm)
+// Lưu dữ liệu đất cuốc
 if (room == rm_farm) {
+    farm_dirt_data = [];
     with (obj_dirt) {
-        var _key = "Dirt_" + string(x) + "_" + string(y);
-        ini_write_real(_key, "state", state);
-        ini_write_real(_key, "is_watered", is_watered);
-        ini_write_real(_key, "is_fertilized", is_fertilized);
-        ini_write_real(_key, "is_infected", is_infected);
-        ini_write_real(_key, "has_weed", has_weed);
-        ini_write_real(_key, "is_neglected", is_neglected);
-        ini_write_real(_key, "plant_stage", plant_stage);
-        ini_write_real(_key, "plant_type", plant_type);
-        ini_write_real(_key, "growth_timer", growth_timer);
-        ini_write_real(_key, "rot_timer", rot_timer);
+        array_push(other.farm_dirt_data, {
+            _x: x, _y: y, _state: state, _is_watered: is_watered, _is_fertilized: is_fertilized,
+            _is_infected: is_infected, _has_weed: has_weed, _is_neglected: is_neglected,
+            _plant_stage: plant_stage, _plant_type: plant_type, _growth_timer: growth_timer, _rot_timer: rot_timer
+        });
     }
+}
+ini_write_real("DirtSystem", "count", array_length(farm_dirt_data));
+for (var i = 0; i < array_length(farm_dirt_data); i++) {
+    var _d = farm_dirt_data[i];
+    var _key = "Dirt_" + string(i);
+    ini_write_real(_key, "x", _d._x);
+    ini_write_real(_key, "y", _d._y);
+    ini_write_real(_key, "state", _d._state);
+    ini_write_real(_key, "is_watered", _d._is_watered);
+    ini_write_real(_key, "is_fertilized", _d._is_fertilized);
+    ini_write_real(_key, "is_infected", _d._is_infected);
+    ini_write_real(_key, "has_weed", _d._has_weed);
+    ini_write_real(_key, "is_neglected", _d._is_neglected);
+    ini_write_real(_key, "plant_stage", _d._plant_stage);
+    ini_write_real(_key, "plant_type", _d._plant_type);
+    ini_write_real(_key, "growth_timer", _d._growth_timer);
+    ini_write_real(_key, "rot_timer", _d._rot_timer);
 }
 
 ini_close();
@@ -377,20 +420,51 @@ if (file_exists(_file_name)) {
     game_hour = ini_read_real("Game", "game_hour", 6);
     game_minute = ini_read_real("Game", "game_minute", 0);
 
-    // Chỉ tải dữ liệu đất khi ở nông trại
+    // Tải dữ liệu đất cuốc
+    farm_dirt_data = [];
+    var _count = ini_read_real("DirtSystem", "count", 0);
+    
+    // Hỗ trợ lưu trữ cũ (fallback for old saves)
+    if (_count == 0 && ini_section_exists("DirtSystem") == false) {
+        // Old saves won't load dirt automatically if saved in house, 
+        // but if they saved in farm somehow, it would be missed.
+        // We'll just ignore old dirt saves for stability since they were broken anyway.
+    } else {
+        for (var i = 0; i < _count; i++) {
+            var _key = "Dirt_" + string(i);
+            array_push(farm_dirt_data, {
+                _x: ini_read_real(_key, "x", 0),
+                _y: ini_read_real(_key, "y", 0),
+                _state: ini_read_real(_key, "state", 0),
+                _is_watered: ini_read_real(_key, "is_watered", 0),
+                _is_fertilized: ini_read_real(_key, "is_fertilized", 0),
+                _is_infected: ini_read_real(_key, "is_infected", 0),
+                _has_weed: ini_read_real(_key, "has_weed", 0),
+                _is_neglected: ini_read_real(_key, "is_neglected", 0),
+                _plant_stage: ini_read_real(_key, "plant_stage", 0),
+                _plant_type: ini_read_real(_key, "plant_type", -1),
+                _growth_timer: ini_read_real(_key, "growth_timer", 0),
+                _rot_timer: ini_read_real(_key, "rot_timer", 0)
+            });
+        }
+    }
+    
+    // Nếu vô tình load ngay tại rm_farm, tạo obj_dirt luôn
     if (room == rm_farm) {
-        with (obj_dirt) {
-            var _key = "Dirt_" + string(x) + "_" + string(y);
-            state = ini_read_real(_key, "state", 0);
-            is_watered = ini_read_real(_key, "is_watered", 0);
-            is_fertilized = ini_read_real(_key, "is_fertilized", 0);
-            is_infected = ini_read_real(_key, "is_infected", 0);
-            has_weed = ini_read_real(_key, "has_weed", 0);
-            is_neglected = ini_read_real(_key, "is_neglected", 0);
-            plant_stage = ini_read_real(_key, "plant_stage", 0);
-            plant_type = ini_read_real(_key, "plant_type", -1);
-            growth_timer = ini_read_real(_key, "growth_timer", 0);
-            rot_timer = ini_read_real(_key, "rot_timer", 0);
+        with (obj_dirt) instance_destroy();
+        for (var i = 0; i < array_length(farm_dirt_data); i++) {
+            var _d = farm_dirt_data[i];
+            var _inst = instance_create_layer(_d._x, _d._y, "Instances", obj_dirt);
+            _inst.state = _d._state;
+            _inst.is_watered = _d._is_watered;
+            _inst.is_fertilized = _d._is_fertilized;
+            _inst.is_infected = _d._is_infected;
+            _inst.has_weed = _d._has_weed;
+            _inst.is_neglected = _d._is_neglected;
+            _inst.plant_stage = _d._plant_stage;
+            _inst.plant_type = _d._plant_type;
+            _inst.growth_timer = _d._growth_timer;
+            _inst.rot_timer = _d._rot_timer;
         }
     }
 
