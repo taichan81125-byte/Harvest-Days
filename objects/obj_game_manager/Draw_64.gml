@@ -141,10 +141,10 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
     draw_set_halign(fa_left); draw_set_valign(fa_top);
 
     // 7. Thời tiết và Mùa (Nằm cạnh ổ khóa !)
-    var _spr_season = spr_icon_mua_xuan;
-    if (current_season == 1) _spr_season = spr_icon_mua_ha;
-    if (current_season == 2) _spr_season = spr_icon_mua_thu;
-    if (current_season == 3) _spr_season = spr_icon_mua_dong;
+    var _spr_season = spr_icon_mua_ha;
+    if (current_season == 1) _spr_season = spr_icon_mua_thu;
+    if (current_season == 2) _spr_season = spr_icon_mua_dong;
+    if (current_season == 3) _spr_season = spr_icon_mua_xuan;
     var _spr_weather = is_raining ? spr_icon_troi_mua : spr_icon_troi_nang;
     
     var _icon_scale = 0.35; // Thu bé đi 30%
