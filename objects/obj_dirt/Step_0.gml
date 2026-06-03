@@ -2,10 +2,10 @@ if (plant_stage > 0) {
     // 1. GIAI ĐOẠN ĐANG LỚN (Giai đoạn 1 và 2)
     if (plant_stage < 3) {
         var _req_season = 0;
-        if (plant_type >= 9 && plant_type <= 12) _req_season = 0;
-        else if (plant_type >= 13 && plant_type <= 14) _req_season = 1;
-        else if (plant_type >= 15 && plant_type <= 16) _req_season = 2;
-        else if (plant_type == 17) _req_season = 3;
+        if (plant_type >= 9 && plant_type <= 12) _req_season = 3; // Xuân (Spring)
+        else if (plant_type >= 13 && plant_type <= 14) _req_season = 0; // Hạ (Summer)
+        else if (plant_type >= 15 && plant_type <= 16) _req_season = 1; // Thu (Autumn)
+        else if (plant_type == 17) _req_season = 2; // Đông (Winter)
         
         var _can_grow = (obj_game_manager.current_season == _req_season);
 

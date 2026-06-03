@@ -161,10 +161,10 @@ function advance_time(_hours) {
         var _d = farm_dirt_data[i];
         if (_d._plant_stage > 0 && _d._plant_stage < 3) {
             var _req_season = 0;
-            if (_d._plant_type >= 9 && _d._plant_type <= 12) _req_season = 0;
-            else if (_d._plant_type >= 13 && _d._plant_type <= 14) _req_season = 1;
-            else if (_d._plant_type >= 15 && _d._plant_type <= 16) _req_season = 2;
-            else if (_d._plant_type == 17) _req_season = 3;
+            if (_d._plant_type >= 9 && _d._plant_type <= 12) _req_season = 3;
+            else if (_d._plant_type >= 13 && _d._plant_type <= 14) _req_season = 0;
+            else if (_d._plant_type >= 15 && _d._plant_type <= 16) _req_season = 1;
+            else if (_d._plant_type == 17) _req_season = 2;
             var _can_grow = (obj_game_manager.current_season == _req_season);
 
             if (_can_grow == true && _d._is_watered == true && _d._is_infected == false) {
@@ -317,18 +317,18 @@ season_particles = [];
 max_particles = 40;
 particle_spawn_timer = 0;
 
-function reset_shop() {
+reset_shop = function() {
+    var _season_seeds = [];
+    if (current_season == 0) _season_seeds = [13, 14]; // Mùa Hạ (Summer)
+    else if (current_season == 1) _season_seeds = [15, 16]; // Mùa Thu (Autumn)
+    else if (current_season == 2) _season_seeds = [17]; // Mùa Đông (Winter)
+    else if (current_season == 3) _season_seeds = [9, 10, 11, 12]; // Mùa Xuân (Spring)
+    
+    // Random ra vật phẩm thường hoặc hạt giống theo mùa
+    var _choices = [4, 5, 6, 7, 8];
+    array_copy(_choices, array_length(_choices), _season_seeds, 0, array_length(_season_seeds));
+    
     for(var i = 0; i < 4; i++) {
-        var _season_seeds = [];
-        if (current_season == 0) _season_seeds = [9, 10, 11, 12];
-        else if (current_season == 1) _season_seeds = [13, 14];
-        else if (current_season == 2) _season_seeds = [15, 16];
-        else if (current_season == 3) _season_seeds = [17];
-        
-        // Random ra vật phẩm thường hoặc hạt giống theo mùa
-        var _choices = [4, 5, 6, 7, 8];
-        array_copy(_choices, array_length(_choices), _season_seeds, 0, array_length(_season_seeds));
-        
         daily_shop[i] = _choices[irandom(array_length(_choices) - 1)];
     }
 }
