@@ -60,6 +60,32 @@ if (global.spr_house_bg == -1) {
 night_events = [];
 show_notifications = false;
 
+// ==========================================
+// TẢI MAP MÙA (SEASONAL MAP SPRITES) - NÔNG TRẠI
+// ==========================================
+global.spr_map_xuan = sprite_add("xuan.png", 1, false, false, 0, 0);
+global.spr_map_ha = sprite_add("ha.png", 1, false, false, 0, 0);
+global.spr_map_thu = sprite_add("thu.png", 1, false, false, 0, 0);
+global.spr_map_dong = sprite_add("dong.png", 1, false, false, 0, 0);
+
+season_map_sprites[0] = global.spr_map_xuan; // 0 = Xuân (Spring)
+season_map_sprites[1] = global.spr_map_ha;   // 1 = Hạ (Summer)
+season_map_sprites[2] = global.spr_map_thu;  // 2 = Thu (Autumn)
+season_map_sprites[3] = global.spr_map_dong; // 3 = Đông (Winter)
+
+// ==========================================
+// TẢI MAP MÙA - THÀNH PHỐ
+// ==========================================
+global.spr_city_xuan = sprite_add(working_directory + "city_xuan.png", 1, false, false, 0, 0);
+global.spr_city_ha = sprite_add(working_directory + "city_ha.png", 1, false, false, 0, 0);
+global.spr_city_thu = sprite_add(working_directory + "city_thu.png", 1, false, false, 0, 0);
+global.spr_city_dong = sprite_add(working_directory + "city_dong.png", 1, false, false, 0, 0);
+
+season_city_sprites[0] = global.spr_city_xuan;
+season_city_sprites[1] = global.spr_city_ha;
+season_city_sprites[2] = global.spr_city_thu;
+season_city_sprites[3] = global.spr_city_dong;
+
 function advance_time(_hours) {
     // Reset thông báo nếu qua đêm
     if (_hours >= 6) {
@@ -198,7 +224,7 @@ audio_master_gain(global.master_vol);
 }
 
 // Bật nhạc nền lặp đi lặp lại (Loop) khi vào phòng Nông trại
-if (room == rm_farm || room == rm_house) {
+if (room == rm_farm || room == rm_house || room == rm_city) {
 if (!audio_is_playing(snd_bgm)) {
 audio_play_sound(snd_bgm, 0, true);
 }
@@ -243,6 +269,19 @@ item_sprites = [
 
 current_season = ((day_count - 1) div 28) % 4; // 0=Xuân, 1=Hạ, 2=Thu, 3=Đông
 daily_shop = [0, 0, 0, 0, 0];
+
+// Biến chuyển mùa mượt mà (crossfade transition)
+season_transition_active = false;
+season_transition_alpha = 1.0;
+season_transition_speed = 0.008; // ~125 frames ≈ 4 giây
+prev_season = current_season;
+season_transition_layer = -1;
+season_transition_bg = -1;
+
+// Hệ thống Particle mùa tùy chỉnh
+season_particles = [];
+max_particles = 40;
+particle_spawn_timer = 0;
 
 function reset_shop() {
     for(var i = 0; i < 5; i++) {

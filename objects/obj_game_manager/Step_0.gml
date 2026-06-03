@@ -1,7 +1,7 @@
 // ==========================================
 // CẬP NHẬT ĐỒNG HỒ SINH HỌC & HIỆU ỨNG ÁNH SÁNG
 // ==========================================
-if (is_paused == false && (room == rm_farm || room == rm_house)) {
+if (is_paused == false && (room == rm_farm || room == rm_house || room == rm_city)) {
     time_ticker += 1;
     
     if (time_ticker >= frames_per_game_minute) {
@@ -59,15 +59,116 @@ if (is_raining == true && room != rm_house) {
     }
 }
 
-// Hiệu ứng rơi rớt theo mùa
-if (room != rm_house) {
-    if (current_season == 0) { // Xuân: Hoa anh đào rơi
-        if (irandom(100) < 5) {
-            effect_create_above(ef_flare, irandom(room_width), irandom(room_height), 0, c_fuchsia);
+// ==========================================
+// KIỂM TRA CHUYỂN MÙA (CROSSFADE)
+// ==========================================
+if (current_season != prev_season) {
+    if (season_transition_active == false) {
+        season_transition_active = true;
+        season_transition_alpha = 0.0;
+    }
+}
+
+if (season_transition_active == true) {
+    season_transition_alpha += season_transition_speed;
+    if (season_transition_alpha >= 1.0) {
+        season_transition_alpha = 1.0;
+        season_transition_active = false;
+        prev_season = current_season;
+    }
+} else {
+    prev_season = current_season;
+    season_transition_alpha = 1.0;
+}
+
+// ==========================================
+// HỆ THỐNG PARTICLE THEO MÙA (TÙY CHỈNH)
+// ==========================================
+if (room == rm_farm || room == rm_city) {
+    // 1. Sinh Particle mới
+    var _spawn_chance = 0;
+    var _season_effect = -1; // 0=Xuân, 2=Thu, 3=Đông (không mưa)
+    
+    // Mùa xuân: Hoa đào rơi | Mùa Thu: Lá phong | Mùa Đông: Tuyết (nếu đang mưa)
+    if (current_season == 0) { _spawn_chance = 8; _season_effect = 0; }
+    else if (current_season == 2) { _spawn_chance = 8; _season_effect = 2; }
+    else if (current_season == 3 && is_raining == true) { _spawn_chance = 20; _season_effect = 3; }
+    
+    particle_spawn_timer += 1;
+    if (particle_spawn_timer > 2 && _season_effect != -1 && is_paused == false) {
+        particle_spawn_timer = 0;
+        if (irandom(100) < _spawn_chance && array_length(season_particles) < max_particles) {
+            // Xem viewport hiện tại để sinh particle xung quanh camera
+            var _vx = camera_get_view_x(view_camera[0]);
+            var _vy = camera_get_view_y(view_camera[0]);
+            var _vw = camera_get_view_width(view_camera[0]);
+            var _vh = camera_get_view_height(view_camera[0]);
+            
+            // X sinh rộng hơn khung nhìn một chút
+            var _start_x = _vx + irandom_range(-200, _vw + 200);
+            var _start_y = _vy - 50; // Luôn rớt từ trên cao xuống
+            
+            var _p = {
+                x: _start_x,
+                y: _start_y,
+                spd_x: 0,
+                spd_y: 0,
+                size: random_range(0.5, 1.2),
+                alpha: random_range(0.5, 1.0),
+                rotation: irandom(360),
+                rot_spd: random_range(-2, 2),
+                type: _season_effect,
+                color: c_white
+            };
+            
+            // Tùy chỉnh thông số theo mùa
+            if (_season_effect == 0) { // Xuân (Hoa đào)
+                _p.spd_x = random_range(1, 2.5); // Gió thổi chéo
+                _p.spd_y = random_range(1.5, 3);
+                _p.color = choose(c_fuchsia, c_white, make_color_rgb(255, 182, 193)); // Hồng lạt/trắng
+            }
+            else if (_season_effect == 2) { // Thu (Lá phong)
+                _p.spd_x = random_range(-1.5, 2.5);
+                _p.spd_y = random_range(1.5, 3.5);
+                _p.rot_spd = random_range(-4, 4);
+                _p.color = choose(c_orange, c_red, c_yellow);
+                _p.size = random_range(0.8, 1.5);
+            }
+            else if (_season_effect == 3) { // Đông (Tuyết)
+                _p.spd_x = random_range(-0.5, 0.5); // Rơi thẳng
+                _p.spd_y = random_range(2, 4.5);
+                _p.rot_spd = random_range(-1, 1);
+                _p.color = c_white;
+                _p.size = random_range(0.3, 0.8);
+            }
+            
+            array_push(season_particles, _p);
         }
-    } else if (current_season == 2) { // Thu: Lá vàng rơi
-        if (irandom(100) < 5) {
-            effect_create_above(ef_flare, irandom(room_width), irandom(room_height), 0, c_orange);
+    }
+    
+    // 2. Cập nhật vị trí Particle
+    if (is_paused == false) {
+        for (var i = array_length(season_particles) - 1; i >= 0; i--) {
+            var _p = season_particles[i];
+            _p.x += _p.spd_x;
+            _p.y += _p.spd_y;
+            _p.rotation += _p.rot_spd;
+            
+            // Nếu xoay vòng lượn sóng nhẹ
+            if (_p.type == 0 || _p.type == 2) {
+                _p.spd_x += random_range(-0.1, 0.1); 
+                _p.spd_x = clamp(_p.spd_x, -2, 3);
+            }
+            
+            // Lấy kích thước camera
+            var _vx = camera_get_view_x(view_camera[0]);
+            var _vy = camera_get_view_y(view_camera[0]);
+            var _vh = camera_get_view_height(view_camera[0]);
+            
+            // Nếu rơi quá màn hình hoặc ra khỏi room -> Xóa
+            if (_p.y > _vy + _vh + 50 || _p.y > room_height || _p.x > room_width || _p.x < 0) {
+                array_delete(season_particles, i, 1);
+            }
         }
     }
 }

@@ -2,8 +2,41 @@
 // BƯỚC ĐỆM LOAD GAME LÚC VỪA VÀO PHÒNG (SAU KHI CHỌN SLOT)
 // ========================================================
 
-// Chỉ chạy logic load/init khi vào rm_farm
-if (room != rm_farm) exit;
+// Chỉ chạy logic load/init khi vào rm_farm hoặc rm_city
+if (room != rm_farm && room != rm_city) exit;
+
+// ==========================================
+// XỬ LÝ TELEPORT GIỮA FARM VÀ CITY (TỰ ĐỘNG TÌM CỬA)
+// ==========================================
+if (variable_global_exists("target_door") && global.target_door != "") {
+    if (global.target_door == "from_farm" && room == rm_city) {
+        if (instance_exists(obj_to_farm)) {
+            // Map City nằm bên trái Farm, nên cổng về Farm nằm ở bên Phải bản đồ City.
+            // Bắn nhân vật ra KHỎI vùng kích hoạt, sang bên Trái của cổng (bbox_left - 32)
+            obj_player.x = obj_to_farm.bbox_left - 32; 
+            // KHÔNG đổi Y, để nhân vật đi đúng cao độ đường
+        }
+    } else if (global.target_door == "from_city" && room == rm_farm) {
+        if (instance_exists(obj_to_city)) {
+            // Map Farm nằm bên phải City, nên cổng về City nằm ở bên Trái bản đồ Farm.
+            // Bắn nhân vật ra KHỎI vùng kích hoạt, sang bên Phải của cổng (bbox_right + 32)
+            obj_player.x = obj_to_city.bbox_right + 32; 
+            // KHÔNG đổi Y, để nhân vật đi đúng cao độ đường
+        }
+    }
+    global.target_door = ""; // Reset
+}
+
+// Ẩn Tile layer cũ (Tiles_1) nếu có để lộ phần hình nền đã được vẽ
+// Đặt đoạn này TRƯỚC khi exit vì mỗi khi quay lại room nó sẽ bị hiện lại
+if (room == rm_farm || room == rm_city) {
+    var _layer_id = layer_get_id("Tiles_1");
+    if (_layer_id != -1) layer_set_visible(_layer_id, false);
+    var _layer_id_3 = layer_get_id("Tiles_3");
+    if (_layer_id_3 != -1) layer_set_visible(_layer_id_3, false);
+    var _layer_id_2 = layer_get_id("Tiles_2");
+    if (_layer_id_2 != -1) layer_set_visible(_layer_id_2, false);
+}
 
 // Tránh chạy lại khi quay về rm_farm từ rm_house (persistent object)
 if (variable_instance_exists(id, "game_initialized") && game_initialized == true) exit;
