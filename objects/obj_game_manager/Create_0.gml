@@ -68,10 +68,10 @@ global.spr_map_ha = sprite_add("ha.png", 1, false, false, 0, 0);
 global.spr_map_thu = sprite_add("thu.png", 1, false, false, 0, 0);
 global.spr_map_dong = sprite_add("dong.png", 1, false, false, 0, 0);
 
-season_map_sprites[0] = global.spr_map_xuan; // 0 = Xuân (Spring)
-season_map_sprites[1] = global.spr_map_ha;   // 1 = Hạ (Summer)
-season_map_sprites[2] = global.spr_map_thu;  // 2 = Thu (Autumn)
-season_map_sprites[3] = global.spr_map_dong; // 3 = Đông (Winter)
+season_map_sprites[0] = global.spr_map_ha;   // 0 = Hạ (Summer)
+season_map_sprites[1] = global.spr_map_thu;  // 1 = Thu (Autumn)
+season_map_sprites[2] = global.spr_map_dong; // 2 = Đông (Winter)
+season_map_sprites[3] = global.spr_map_xuan; // 3 = Xuân (Spring)
 
 // ==========================================
 // TẢI MAP MÙA - THÀNH PHỐ
@@ -81,10 +81,10 @@ global.spr_city_ha = sprite_add(working_directory + "city_ha.png", 1, false, fal
 global.spr_city_thu = sprite_add(working_directory + "city_thu.png", 1, false, false, 0, 0);
 global.spr_city_dong = sprite_add(working_directory + "city_dong.png", 1, false, false, 0, 0);
 
-season_city_sprites[0] = global.spr_city_xuan;
-season_city_sprites[1] = global.spr_city_ha;
-season_city_sprites[2] = global.spr_city_thu;
-season_city_sprites[3] = global.spr_city_dong;
+season_city_sprites[0] = global.spr_city_ha;
+season_city_sprites[1] = global.spr_city_thu;
+season_city_sprites[2] = global.spr_city_dong;
+season_city_sprites[3] = global.spr_city_xuan;
 
 function advance_time(_hours) {
     // Reset thông báo nếu qua đêm
@@ -373,6 +373,7 @@ if (file_exists(_file_name)) {
     }
 
     day_count = ini_read_real("Game", "day_count", 1);
+    current_season = ((day_count - 1) div 28) % 4; // Tính lại mùa
     game_hour = ini_read_real("Game", "game_hour", 6);
     game_minute = ini_read_real("Game", "game_minute", 0);
 

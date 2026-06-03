@@ -52,9 +52,14 @@ if (!variable_global_exists("is_new_game")) {
 if (global.is_new_game == true) {
     // Trường hợp 1: Người chơi bấm vào Slot Trống và vừa gõ tên xong
     owner_name = global.player_name;
+    day_count = 1; // Luôn bắt đầu từ Ngày 1
+    current_season = 0; // Mùa Hạ (đã remap)
     show_debug_message("Bắt đầu Game Mới với tài khoản: " + owner_name);
 } 
 else {
     // Trường hợp 2: Người chơi bấm vào Slot đã có tên (Chơi tiếp)
     load_game(global.current_save_file);
 }
+
+// Cập nhật lại tốc độ thời gian cho đúng với từng save slot
+frames_per_game_minute = (global.current_save_file == "slot4.ini") ? 2 : 5;

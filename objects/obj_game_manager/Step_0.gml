@@ -26,11 +26,9 @@ if (is_paused == false && (room == rm_farm || room == rm_house || room == rm_cit
                 }
             }
             if (_weed_count > 0) {
-                array_push(night_events, "- Cỏ dại mới mọc quanh ruộng lúc " + string(game_hour) + "h.");
                 show_notifications = true;
             }
             if (_infected_count > 0) {
-                array_push(night_events, "- Cảnh báo: " + string(_infected_count) + " cây bị sâu bệnh lúc " + string(game_hour) + "h!");
                 show_notifications = true;
             }
             
@@ -243,6 +241,7 @@ var _my = device_mouse_y_to_gui(0);
 // 1. CLICK NÚT X TẮT BẢNG THÔNG BÁO (Ưu tiên cao nhất)
 if (show_notifications == true && _mx >= 850 && _mx <= 980 && _my >= 120 && _my <= 220) {
     show_notifications = false;
+    night_events = []; // Xóa các thông báo sự kiện 1 lần sau khi xem
 }
 // 2. CLICK NÚT ! Ổ KHÓA (KHI CHƯA MỞ PAUSE)
 else if (is_paused == false && _mx >= 1200 && _mx <= 1280 && _my >= 110 && _my <= 180 && (room == rm_farm || room == rm_house || room == rm_city)) {

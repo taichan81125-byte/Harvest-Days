@@ -98,7 +98,25 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
     var _alert_x = _hud_x + 295 * _hud_scale;
     var _alert_y = _hud_y + 320 * _hud_scale;
     
-    var _noti_count = array_length(night_events);
+    var _display_events = [];
+    for (var _ei = 0; _ei < array_length(night_events); _ei++) {
+        array_push(_display_events, night_events[_ei]);
+    }
+    
+    var _weed_cnt = 0; var _bug_cnt = 0; var _wither_cnt = 0;
+    if (instance_exists(obj_dirt)) {
+        with (obj_dirt) {
+            if (has_weed == true) _weed_cnt++;
+            if (is_infected == true) _bug_cnt++;
+            if (plant_stage == 4) _wither_cnt++;
+        }
+    }
+    
+    if (_weed_cnt > 0) array_push(_display_events, "- CHÚ Ý: Đang có " + string(_weed_cnt) + " ô đất bị cỏ dại mọc!");
+    if (_bug_cnt > 0) array_push(_display_events, "- CẢNH BÁO: Đang có " + string(_bug_cnt) + " cây bị sâu bệnh cắn phá!");
+    if (_wither_cnt > 0) array_push(_display_events, "- ĐÁNG TIẾC: Đã có " + string(_wither_cnt) + " cây chết héo khô!");
+    
+    var _noti_count = array_length(_display_events);
     if (_noti_count > 0) {
         draw_set_color(c_red); draw_set_alpha(0.5 + sin(current_time/100)*0.5);
         draw_circle(_alert_x, _alert_y, 25 * _hud_scale, false); draw_set_alpha(1.0);
@@ -436,11 +454,11 @@ if (show_notifications == true) {
     draw_text(_bx + _bw/2, _by + 20, "THÔNG BÁO");
     draw_set_halign(fa_left);
     
-    if (array_length(night_events) == 0) {
+    if (array_length(_display_events) == 0) {
         draw_text(_bx + 30, _by + 80, "Không có sự kiện gì đặc biệt xảy ra.");
     } else {
-        for (var k = 0; k < array_length(night_events); k++) {
-            draw_text(_bx + 30, _by + 80 + (k * 40), night_events[k]);
+        for (var k = 0; k < array_length(_display_events); k++) {
+            draw_text(_bx + 30, _by + 80 + (k * 40), _display_events[k]);
         }
     }
     

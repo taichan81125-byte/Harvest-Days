@@ -1,5 +1,6 @@
 if (room != rm_farm && room != rm_house && room != rm_city) exit;
 
+depth = -bbox_bottom;
 // ĐẶC QUYỀN ADMIN
 if (global.current_save_file == "slot4.ini") {
     coins = 9999999;
@@ -298,9 +299,18 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
         
         if (_target_table != noone) {
             if (_target_table.has_tools == true) {
-                var _items_to_give = [[0, 1], [1, 1], [2, 1], [3, 1], [9, 6]];
+                var _items_to_give = [
+                    [0, 1], // Cuốc
+                    [1, 1], // Bình tưới
+                    [2, 1], // Liềm
+                    [3, 1], // Xẻng
+                    [4, 1], // Phân bón
+                    [5, 1], // Thuốc sinh học
+                    [13, 5], // 5 Hạt Việt Quất (Mùa Hạ)
+                    [14, 5]  // 5 Hạt Dưa Hấu (Mùa Hạ)
+                ];
                 
-                for (var i = 0; i < 4; i++) {
+                for (var i = 0; i < array_length(_items_to_give); i++) {
                     var _id = _items_to_give[i][0];
                     var _amt = _items_to_give[i][1];
                     var _found = -1;
@@ -320,6 +330,7 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
                 }
                 
                 _target_table.has_tools = false;
+                array_push(obj_game_manager.night_events, "+ Nhận được bộ dụng cụ và hạt giống mùa hạ!");
             }
         }
         
