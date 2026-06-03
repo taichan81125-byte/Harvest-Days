@@ -1,4 +1,4 @@
-if (room != rm_farm && room != rm_house) exit;
+if (room != rm_farm && room != rm_house && room != rm_city) exit;
 
 // 1. LẤY THÔNG TIN VẬT PHẨM ĐANG CẦM
 var _current_item = -1;

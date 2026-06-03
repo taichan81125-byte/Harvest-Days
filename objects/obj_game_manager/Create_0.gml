@@ -37,7 +37,7 @@ is_raining = false;
 game_hour = 6;              // Giờ hiện tại (0-23), bắt đầu lúc 6h sáng
 game_minute = 0;            // Phút hiện tại (0-59)
 time_ticker = 0;            // Bộ đếm frame nội bộ
-frames_per_game_minute = (global.player_name == "Admin_farm") ? 2 : 5; // Admin thời gian trôi siêu tốc (gấp 2.5 lần)
+frames_per_game_minute = (global.current_save_file == "slot4.ini") ? 2 : 5; // Admin thời gian trôi siêu tốc (gấp 2.5 lần)
 
 // Hiệu ứng ngày/đêm
 day_overlay_alpha = 0;      // Độ tối của lớp phủ

@@ -12,6 +12,32 @@ if (is_paused == false && (room == rm_farm || room == rm_house || room == rm_cit
             game_minute = 0;
             game_hour += 1;
             
+            // Tự động mọc cỏ dại và sâu bệnh mỗi giờ
+            var _weed_count = 0;
+            var _infected_count = 0;
+            with (obj_dirt) {
+                if (state == 1 && has_weed == false && irandom(100) < 2) {
+                    has_weed = true;
+                    _weed_count++;
+                }
+                if (plant_stage > 0 && plant_stage < 3 && is_infected == false && irandom(100) < 2) {
+                    is_infected = true;
+                    _infected_count++;
+                }
+            }
+            if (_weed_count > 0) {
+                array_push(night_events, "- Cỏ dại mới mọc quanh ruộng lúc " + string(game_hour) + "h.");
+                show_notifications = true;
+            }
+            if (_infected_count > 0) {
+                array_push(night_events, "- Cảnh báo: " + string(_infected_count) + " cây bị sâu bệnh lúc " + string(game_hour) + "h!");
+                show_notifications = true;
+            }
+            
+            if (game_hour == 6) {
+                night_events = []; // Xóa log báo cáo mỗi sáng
+            }
+            
             if (game_hour >= 24) {
                 game_hour = 0;
             }
@@ -174,8 +200,11 @@ if (room == rm_farm || room == rm_city) {
 }
 
 // BẤM ESC ĐỂ BẬT/TẮT PAUSE
-if (keyboard_check_pressed(vk_escape) && (room == rm_farm || room == rm_house) && show_notifications == false) {
-    if (is_paused == false) {
+if (keyboard_check_pressed(vk_escape) && (room == rm_farm || room == rm_house || room == rm_city)) {
+    if (show_notifications == true) {
+        show_notifications = false;
+    }
+    else if (is_paused == false) {
         is_paused = true;
         show_shop = false;
         show_dialogue = false;
@@ -211,22 +240,16 @@ if (mouse_check_button_pressed(mb_left)) {
 var _mx = device_mouse_x_to_gui(0);
 var _my = device_mouse_y_to_gui(0);
 
-// 1. CLICK BẢNG THÔNG BÁO OVERNIGHT (Ưu tiên cao nhất)
-if (show_notifications == true) {
-    // Click nút X để đóng
-    if (_mx >= 890 && _mx <= 930 && _my >= 160 && _my <= 190) {
-        show_notifications = false;
-        is_paused = false;
-        night_events = [];
-    }
+// 1. CLICK NÚT X TẮT BẢNG THÔNG BÁO (Ưu tiên cao nhất)
+if (show_notifications == true && _mx >= 850 && _mx <= 980 && _my >= 120 && _my <= 220) {
+    show_notifications = false;
 }
 // 2. CLICK NÚT ! Ổ KHÓA (KHI CHƯA MỞ PAUSE)
-else if (is_paused == false && _mx >= 1225 && _mx <= 1260 && _my >= 125 && _my <= 165 && (room == rm_farm || room == rm_house)) {
-    show_notifications = true;
-    is_paused = true;
+else if (is_paused == false && _mx >= 1200 && _mx <= 1280 && _my >= 110 && _my <= 180 && (room == rm_farm || room == rm_house || room == rm_city)) {
+    show_notifications = !show_notifications;
 }
 // 3. CLICK ICON BÁNH RĂNG (MỞ PAUSE) - CHỈ Ở TRONG GAME
-else if (is_paused == false && _mx > 1200 && _mx < 1260 && _my > 0 && _my < 50 && (room == rm_farm || room == rm_house)) {
+else if (is_paused == false && _mx > 1200 && _mx < 1260 && _my > 0 && _my < 50 && (room == rm_farm || room == rm_house || room == rm_city)) {
     is_paused = true;
     show_shop = false;
     show_dialogue = false;
@@ -299,7 +322,7 @@ else if (is_paused == true && show_settings == true) {
 
 
 // BẤM TAB ĐỂ BẬT/TẮT KHO ĐỒ
-if (keyboard_check_pressed(vk_tab) && (room == rm_farm || room == rm_house) && show_notifications == false) {
+if (keyboard_check_pressed(vk_tab) && (room == rm_farm || room == rm_house || room == rm_city) && show_notifications == false) {
     if (show_inventory == false) {
         show_inventory = true;
         is_paused = true;

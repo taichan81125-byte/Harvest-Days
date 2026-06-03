@@ -1,7 +1,7 @@
-if (room != rm_farm && room != rm_house) exit;
+if (room != rm_farm && room != rm_house && room != rm_city) exit;
 
 // ĐẶC QUYỀN ADMIN
-if (global.player_name == "Admin_farm") {
+if (global.current_save_file == "slot4.ini") {
     coins = 9999999;
     if (keyboard_check_pressed(ord("R"))) {
         obj_game_manager.reset_shop();
@@ -342,7 +342,7 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
         // ĐI NGỦ
         if (_target_bed != noone) {
             var _cur_h = obj_game_manager.game_hour;
-            if (_cur_h >= 18 || _cur_h < 6 || global.player_name == "Admin_farm") {
+            if (_cur_h >= 18 || _cur_h < 6 || global.current_save_file == "slot4.ini") {
                 var _hours_diff = 0;
                 if (_cur_h >= 6) _hours_diff = 24 - _cur_h + 6;
                 else _hours_diff = 6 - _cur_h;

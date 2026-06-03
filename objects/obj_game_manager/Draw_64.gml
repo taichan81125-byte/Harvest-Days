@@ -11,8 +11,8 @@ if ((room == rm_farm || room == rm_house || room == rm_city) && day_overlay_alph
     draw_set_alpha(1.0);
 }
 if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room == rm_city)) {
-    // Kéo các UI như tim và thức ăn sang trái một chút (về tọa độ 950) để nhường chỗ cho Đồng hồ
-    var _ui_right_x = 950; 
+    // Kéo các UI như tim và thức ăn sang phải một chút để sát với Đồng hồ hơn
+    var _ui_right_x = 1005; 
     
     for (var i = 0; i < 3; i++) {
         if (i < obj_player.hp) draw_sprite(spr_heart_full, 0, _ui_right_x + (i * 36), 20); 
@@ -64,8 +64,11 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
         case 5: _dow_str = "Sat."; break;
         case 6: _dow_str = "Sun."; break;
     }
+    
+    var _day_of_season = ((day_count - 1) % 28) + 1;
+    
     draw_set_color(c_black); draw_set_halign(fa_center); draw_set_valign(fa_middle);
-    draw_text_transformed(_hud_x + 213 * _hud_scale, _hud_y + 45 * _hud_scale, _dow_str + " " + string(day_count), 0.75, 0.75, 0);
+    draw_text_transformed(_hud_x + 220 * _hud_scale, _hud_y + 45 * _hud_scale, _dow_str + " " + string(_day_of_season), 0.75, 0.75, 0);
     
     // 4. Giờ AM / PM
     var _am_pm = game_hour < 12 ? " am" : " pm";
@@ -95,11 +98,29 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
     var _alert_x = _hud_x + 295 * _hud_scale;
     var _alert_y = _hud_y + 320 * _hud_scale;
     
-    var _has_alerts = array_length(night_events) > 0;
-    if (_has_alerts) {
+    var _noti_count = array_length(night_events);
+    if (_noti_count > 0) {
         draw_set_color(c_red); draw_set_alpha(0.5 + sin(current_time/100)*0.5);
         draw_circle(_alert_x, _alert_y, 25 * _hud_scale, false); draw_set_alpha(1.0);
     }
+    
+    // HUY HIỆU SỐ THÔNG BÁO (Góc trên bên trái ổ khóa)
+    var _bx = _alert_x - 1;
+    var _by = _alert_y - 8;
+    
+    // Ô tròn màu đỏ
+    draw_set_color(c_red);
+    draw_circle(_bx, _by, 5.5, false);
+    
+    // Viền trắng cho nổi bật
+    draw_set_color(c_white);
+    draw_circle(_bx, _by, 5.5, true);
+    
+    // Số màu trắng
+    draw_set_color(c_white);
+    draw_set_halign(fa_center); draw_set_valign(fa_middle);
+    draw_text_transformed(_bx, _by, string(_noti_count), 0.5, 0.5, 0);
+    draw_set_halign(fa_left); draw_set_valign(fa_top);
 
     // 7. Thời tiết và Mùa (Nằm cạnh ổ khóa !)
     var _spr_season = spr_icon_mua_xuan;
@@ -161,7 +182,7 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
     // ==========================================
     if (room == rm_farm || room == rm_city) {
         var _mm_x = 20;
-        var _mm_y = 60;
+        var _mm_y = 15; // Đẩy minimap lên trên cùng
         var _mm_w = 200;
         var _mm_h = 150;
         
@@ -218,8 +239,6 @@ if (instance_exists(obj_player) && (room == rm_farm || room == rm_house || room 
         draw_set_color(c_red);
         draw_circle(_px, _py, 3, false);
     }
-
-}
 
 // =========================================================
 // MỤC MỚI: VẼ MENU TẠM DỪNG VÀ CÀI ĐẶT
@@ -414,7 +433,7 @@ if (show_notifications == true) {
     draw_rectangle(_bx + 5, _by + 5, _bx + _bw - 5, _by + _bh - 5, false);
     
     draw_set_color(c_white); draw_set_halign(fa_center);
-    draw_text(_bx + _bw/2, _by + 20, "TÓM TẮT QUA ĐÊM");
+    draw_text(_bx + _bw/2, _by + 20, "THÔNG BÁO");
     draw_set_halign(fa_left);
     
     if (array_length(night_events) == 0) {
