@@ -10,11 +10,7 @@ if ((room == rm_farm || room == rm_house) && day_overlay_alpha > 0) {
     draw_rectangle(0, 0, 1280, 720, false);
     draw_set_alpha(1.0);
 }
-if (instance_exists(obj_player)) {
-draw_set_color(c_yellow);
-draw_text(20, 20, "Tiền (Coins): " + string(obj_player.coins));
-
-if (room == rm_farm || room == rm_house) {
+if (instance_exists(obj_player) && (room == rm_farm || room == rm_house)) {if (room == rm_farm || room == rm_house) {
     // Kéo các UI như tim và thức ăn sang trái một chút (về tọa độ 950) để nhường chỗ cho Đồng hồ
     var _ui_right_x = 950; 
     
@@ -31,41 +27,105 @@ if (room == rm_farm || room == rm_house) {
     draw_sprite_ext(spr_icon_gear, 0, 1155, -19, 0.33, 0.33, 0, c_white, 1);
 
     // ==========================================
-    // VẼ ĐỒNG HỒ VÀ NGÀY
+    // VẼ HUD THỜI GIAN THEO PHONG CÁCH STARDEW VALLEY
     // ==========================================
-    var _clock_str = string(game_hour) + ":" + (game_minute < 10 ? "0" : "") + string(game_minute);
+    var _hud_scale = 0.4; // Thu nhỏ toàn bộ 40% so với trước
+    var _hud_w = 339 * _hud_scale;
+    var _hud_h = 358 * _hud_scale;
+    var _hud_x = 1260 - _hud_w; // Góc trên phải
+    var _hud_y = 15;
     
-    // Đặt đồng hồ ở giữa trái tim (1022) và nút cài đặt (1180), nên _cx tầm 1130
-    var _cx = 1130;
-    var _cy = 50;
-    var _clock_scale = 160 / 450; // Cho đồng hồ to hơn (đường kính tầm 160px)
+    // 1. Vẽ khung HUD spr_time_day
+    draw_sprite_ext(spr_time_day, 0, _hud_x, _hud_y, _hud_scale, _hud_scale, 0, c_white, 1);
     
-    draw_sprite_ext(spr_mat_dong_ho, 0, _cx, _cy, _clock_scale, _clock_scale, 0, c_white, 1);
-    
+    // 2. Tính toán Kim đồng hồ (Xoay trên bán nguyệt trái)
+    sprite_set_offset(spr_cay_kim, 43, 335); // Đặt lại tâm kim quay vào đáy kim
+    var _kim_scale = 0.09; // Thu nhỏ thêm 50% nữa
     var _time_decimal = game_hour + (game_minute / 60);
-    // Đồng hồ quay thuận chiều kim (12h/vòng):
-    // 00h/12h -> Góc 0 (Chỉ lên trên)
-    // 03h/15h -> Góc -90 (Chỉ sang phải)
-    // 06h/18h -> Góc -180 (Chỉ xuống dưới)
-    // 09h/21h -> Góc 90 (Chỉ sang trái)
-    var _angle = -(_time_decimal * 30);
+    if (_time_decimal < 6) _time_decimal += 24; // Tính từ 6 AM sáng
     
-    draw_sprite_ext(spr_kim_dong_ho, 0, _cx, _cy, _clock_scale, _clock_scale, _angle, c_white, 1);
+    // Xoay 180 độ từ Sáng (Góc dưới trái) đến Tối (Góc trên trái)
+    var _angle = 135 - (_time_decimal - 6) * 5; 
+    
+    // Đẩy tâm quay về đúng đoạn rãnh gờ của khối bán nguyệt
+    var _pivot_x = _hud_x + 105 * _hud_scale;
+    var _pivot_y = _hud_y + 95 * _hud_scale;
+    draw_sprite_ext(spr_cay_kim, 0, _pivot_x, _pivot_y, _kim_scale, _kim_scale, _angle, c_white, 1);
+    
+    // 3. Text THỨ và NGÀY
+    var _day_of_week = (day_count - 1) % 7;
+    var _dow_str = "";
+    switch(_day_of_week) {
+        case 0: _dow_str = "Mon."; break;
+        case 1: _dow_str = "Tue."; break;
+        case 2: _dow_str = "Wed."; break;
+        case 3: _dow_str = "Thu."; break;
+        case 4: _dow_str = "Fri."; break;
+        case 5: _dow_str = "Sat."; break;
+        case 6: _dow_str = "Sun."; break;
+    }
+    draw_set_color(c_black); draw_set_halign(fa_center); draw_set_valign(fa_middle);
+    draw_text_transformed(_hud_x + 213 * _hud_scale, _hud_y + 45 * _hud_scale, _dow_str + " " + string(day_count), 0.75, 0.75, 0);
+    
+    // 4. Giờ AM / PM
+    var _am_pm = game_hour < 12 ? " am" : " pm";
+    var _display_hour = game_hour % 12;
+    if (_display_hour == 0) _display_hour = 12;
+    var _time_str = string(_display_hour) + ":" + (game_minute < 10 ? "0" : "") + string(game_minute) + _am_pm;
+    draw_set_color(make_color_rgb(150, 0, 0)); // Đỏ đậm
+    draw_text_transformed(_hud_x + 220 * _hud_scale, _hud_y + 155 * _hud_scale, _time_str, 0.75, 0.75, 0);
+    
+    // 5. Số Vàng (Mỗi số 1 ô vuông)
+    var _gold_str = string(obj_player.coins);
+    var _len = string_length(_gold_str);
+    if (_len > 8) _gold_str = string_copy(_gold_str, 1, 8);
+    var _start_idx = 8 - _len; // Căn phải
+    
+    draw_set_color(make_color_rgb(100, 20, 20));
+    for (var i = 1; i <= _len; i++) {
+        var _char = string_char_at(_gold_str, i);
+        var _slot_index = _start_idx + i - 1; 
+        var _char_x = _hud_x + (85 + _slot_index * 28.5) * _hud_scale;
+        var _char_y = _hud_y + 255 * _hud_scale;
+        draw_text_transformed(_char_x, _char_y, _char, 0.75, 0.75, 0);
+    }
+    draw_set_halign(fa_left); draw_set_valign(fa_top);
+    
+    // 6. Dấu Chấm Than ! (Sử dụng trực tiếp ổ khóa của spr_time_day)
+    var _alert_x = _hud_x + 295 * _hud_scale;
+    var _alert_y = _hud_y + 320 * _hud_scale;
+    
+    var _has_alerts = array_length(night_events) > 0;
+    if (_has_alerts) {
+        draw_set_color(c_red); draw_set_alpha(0.5 + sin(current_time/100)*0.5);
+        draw_circle(_alert_x, _alert_y, 25 * _hud_scale, false); draw_set_alpha(1.0);
+    }
 
-    // Text Ngày và Giờ (Cắt xa nhau ra một chút)
-    draw_set_color(c_white);
-    draw_set_halign(fa_center);
-    draw_text(_cx, _cy + 45, "Ngày " + string(day_count));
-    draw_set_color(c_yellow);
-    draw_text(_cx, _cy + 75, _clock_str);
-    draw_set_halign(fa_left);
+    // 7. Thời tiết và Mùa (Nằm cạnh ổ khóa !)
+    var _spr_season = spr_icon_mua_xuan;
+    if (current_season == 1) _spr_season = spr_icon_mua_ha;
+    if (current_season == 2) _spr_season = spr_icon_mua_thu;
+    if (current_season == 3) _spr_season = spr_icon_mua_dong;
+    var _spr_weather = is_raining ? spr_icon_troi_mua : spr_icon_troi_nang;
+    
+    var _icon_scale = 0.35; // Thu bé đi 30%
+    draw_sprite_ext(_spr_weather, 0, _alert_x - 90, _alert_y - 10, _icon_scale, _icon_scale, 0, c_white, 1);
+    draw_sprite_ext(_spr_season, 0, _alert_x - 60, _alert_y - 10, _icon_scale, _icon_scale, 0, c_white, 1);
     var _start_x = 340; var _y = 650;       
     
     for(var j = 0; j < 10; j++) {
         var _slot_x = _start_x + (j * 60);
+        
+        // Vẽ viền sáng khi đang chọn
         if (obj_player.selected_slot == j) { draw_set_color(c_yellow); draw_rectangle(_slot_x - 3, _y - 3, _slot_x + 53, _y + 53, false); }
-        draw_set_color(c_dkgray); draw_rectangle(_slot_x, _y, _slot_x + 50, _y + 50, false);
-        draw_set_color(c_white); draw_rectangle(_slot_x, _y, _slot_x + 50, _y + 50, true);
+        
+        // Nền ô mờ ảo bóng bẩy
+        draw_set_color(c_black); draw_set_alpha(0.6);
+        draw_rectangle(_slot_x, _y, _slot_x + 50, _y + 50, false);
+        draw_set_alpha(1.0);
+        
+        // Viền ô màu kim loại
+        draw_set_color(c_silver); draw_rectangle(_slot_x, _y, _slot_x + 50, _y + 50, true);
         
         var _item_id = obj_player.inventory[j];
         if (_item_id != -1) {
@@ -74,10 +134,16 @@ if (room == rm_farm || room == rm_house) {
             
             var _count = obj_player.inventory_count[j];
             if (_count > 1) {
-                draw_set_color(c_white); draw_set_halign(fa_right); draw_text(_slot_x + 48, _y + 30, string(_count)); draw_set_halign(fa_left);
+                draw_set_color(c_black); draw_set_halign(fa_right); draw_text(_slot_x + 49, _y + 31, string(_count)); // Bóng đổ cho số lượng
+                draw_set_color(c_white); draw_text(_slot_x + 48, _y + 30, string(_count)); draw_set_halign(fa_left);
             }
         }
-        draw_set_color(c_yellow); if (j == 9) draw_text(_slot_x + 5, _y - 25, "0"); else draw_text(_slot_x + 5, _y - 25, string(j + 1));
+        
+        // Số 1-10 ở dưới
+        draw_set_color(c_black); 
+        if (j == 9) draw_text(_slot_x + 6, _y - 24, "0"); else draw_text(_slot_x + 6, _y - 24, string(j + 1));
+        draw_set_color(c_yellow); 
+        if (j == 9) draw_text(_slot_x + 5, _y - 25, "0"); else draw_text(_slot_x + 5, _y - 25, string(j + 1));
     }
     
     if (obj_player.item_popup_timer > 0 && obj_player.selected_slot != -1) {
@@ -101,7 +167,7 @@ draw_set_color(c_black); draw_set_alpha(0.8); draw_rectangle(0, 0, 1280, 720, fa
 draw_set_halign(fa_center);
 
 // NẾU ĐANG Ở MENU PAUSE THƯỜNG
-if (show_settings == false) {
+if (show_settings == false && show_inventory == false) {
     draw_set_color(c_yellow); draw_text_transformed(640, 100, "TẠM DỪNG", 2, 2, 0);
     var _btn_w = 300; var _btn_h = 60; var _btn_x = 640 - (_btn_w / 2);
     var _btn_texts = ["Tiếp Tục", "Cài Đặt", "Thoát Về Menu"];
@@ -114,7 +180,7 @@ if (show_settings == false) {
     }
 }
 // NẾU ĐANG BẬT BẢNG CÀI ĐẶT
-else {
+else if (show_settings == true) {
     draw_set_color(c_yellow); draw_text_transformed(640, 100, "CÀI ĐẶT ÂM THANH", 2, 2, 0);
     
     // Vẽ chữ hiển thị % âm lượng
@@ -143,6 +209,91 @@ else {
     // Vẽ nút TRỞ VỀ
     draw_set_color(c_dkgray); draw_rectangle(540, 500, 740, 550, false);
     draw_set_color(c_red); draw_rectangle(540, 500, 740, 550, true); draw_text(640, 510, "Trở Về");
+}
+// NẾU ĐANG MỞ KHO ĐỒ
+else if (show_inventory == true) {
+    // Vẽ Tiêu đề có bóng đổ
+    draw_set_color(c_black); draw_text_transformed(642, 102, "KHO ĐỒ CÁ NHÂN", 2, 2, 0);
+    draw_set_color(c_yellow); draw_text_transformed(640, 100, "KHO ĐỒ CÁ NHÂN", 2, 2, 0);
+    draw_set_halign(fa_left);
+    
+    var _start_x = 340;
+    
+    // Panel kính mờ ảo phía sau UI Inventory
+    draw_set_color(c_white); draw_set_alpha(0.08);
+    draw_roundrect(_start_x - 20, 460, _start_x + (10 * 60) + 10, 715, false);
+    draw_set_color(c_yellow); draw_set_alpha(0.2);
+    draw_roundrect(_start_x - 20, 460, _start_x + (10 * 60) + 10, 715, true);
+    draw_set_alpha(1.0);
+    
+    // VẼ KHO ĐỒ 20 Ô (2 HÀNG)
+    for (var i = 0; i < 2; i++) {
+        var _y = (i == 0) ? 480 : 550;
+        for (var j = 0; j < 10; j++) {
+            var _slot_index = (i * 10) + j;
+            var _slot_x = _start_x + (j * 60);
+            
+            draw_set_color(c_black); draw_set_alpha(0.6);
+            draw_rectangle(_slot_x, _y, _slot_x + 50, _y + 50, false);
+            draw_set_alpha(1.0);
+            draw_set_color(c_silver); draw_rectangle(_slot_x, _y, _slot_x + 50, _y + 50, true);
+            
+            var _item_id = obj_player.bag[_slot_index];
+            if (_item_id != -1) {
+                var _spr = item_sprites[_item_id];
+                draw_sprite_stretched(_spr, 0, _slot_x + 5, _y + 5, 40, 40);
+                var _count = obj_player.bag_count[_slot_index];
+                if (_count > 1) {
+                    draw_set_color(c_black); draw_set_halign(fa_right); draw_text(_slot_x + 49, _y + 31, string(_count));
+                    draw_set_color(c_white); draw_text(_slot_x + 48, _y + 30, string(_count)); draw_set_halign(fa_left);
+                }
+            }
+        }
+    }
+    
+    // VẼ HOTBAR (DÙ NÓ ĐƯỢC VẼ Ở TRÊN NHƯNG KHI MỞ INVENTORY CẦN VẼ LẠI ĐỂ KHÔNG BỊ LỚP MỜ ĐÈ LÊN)
+    var _hy = 650;
+    for (var j = 0; j < 10; j++) {
+        var _slot_x = _start_x + (j * 60);
+        if (obj_player.selected_slot == j) { draw_set_color(c_yellow); draw_rectangle(_slot_x - 3, _hy - 3, _slot_x + 53, _hy + 53, false); }
+        
+        draw_set_color(c_black); draw_set_alpha(0.6);
+        draw_rectangle(_slot_x, _hy, _slot_x + 50, _hy + 50, false);
+        draw_set_alpha(1.0);
+        draw_set_color(c_silver); draw_rectangle(_slot_x, _hy, _slot_x + 50, _hy + 50, true);
+        
+        var _item_id = obj_player.inventory[j];
+        if (_item_id != -1) {
+            var _spr = item_sprites[_item_id];
+            draw_sprite_stretched(_spr, 0, _slot_x + 5, _hy + 5, 40, 40);
+            var _count = obj_player.inventory_count[j];
+            if (_count > 1) {
+                draw_set_color(c_black); draw_set_halign(fa_right); draw_text(_slot_x + 49, _hy + 31, string(_count));
+                draw_set_color(c_white); draw_text(_slot_x + 48, _hy + 30, string(_count)); draw_set_halign(fa_left);
+            }
+        }
+        
+        draw_set_color(c_black); 
+        if (j == 9) draw_text(_slot_x + 6, _hy - 24, "0"); else draw_text(_slot_x + 6, _hy - 24, string(j + 1));
+        draw_set_color(c_yellow); 
+        if (j == 9) draw_text(_slot_x + 5, _hy - 25, "0"); else draw_text(_slot_x + 5, _hy - 25, string(j + 1));
+    }
+    
+    // VẼ VẬT PHẨM ĐANG BỊ KÉO DÍNH CHUỘT
+    if (drag_item_id != -1) {
+        var _mx = device_mouse_x_to_gui(0);
+        var _my = device_mouse_y_to_gui(0);
+        var _spr = item_sprites[drag_item_id];
+        
+        // Vẽ bóng đổ cho item đang kéo
+        draw_sprite_stretched_ext(_spr, 0, _mx - 15, _my - 15, 40, 40, c_black, 0.5);
+        draw_sprite_stretched(_spr, 0, _mx - 20, _my - 20, 40, 40);
+        
+        if (drag_item_count > 1) {
+            draw_set_color(c_black); draw_set_halign(fa_right); draw_text(_mx + 19, _my + 6, string(drag_item_count));
+            draw_set_color(c_white); draw_text(_mx + 18, _my + 5, string(drag_item_count)); draw_set_halign(fa_left);
+        }
+    }
 }
 draw_set_halign(fa_left); 
 
@@ -184,4 +335,43 @@ for(var i = 0; i < 5; i++) {
 draw_set_color(c_yellow); draw_text(450, 550, "[Nhấn SPACE để đóng]");
 
 
+}
+
+// VẼ BẢNG THÔNG BÁO OVERNIGHT
+if (show_notifications == true) {
+    // Overlay xám
+    draw_set_color(c_black); draw_set_alpha(0.6);
+    draw_rectangle(0, 0, 1280, 720, false);
+    draw_set_alpha(1.0);
+    
+    // Khung gỗ hiển thị tin
+    var _bx = 340, _by = 150, _bw = 600, _bh = 400;
+    draw_set_color(make_color_rgb(139, 69, 19)); // SaddleBrown
+    draw_rectangle(_bx, _by, _bx + _bw, _by + _bh, false);
+    draw_set_color(make_color_rgb(205, 133, 63)); // Peru
+    draw_rectangle(_bx + 5, _by + 5, _bx + _bw - 5, _by + _bh - 5, false);
+    
+    draw_set_color(c_white); draw_set_halign(fa_center);
+    draw_text(_bx + _bw/2, _by + 20, "TÓM TẮT QUA ĐÊM");
+    draw_set_halign(fa_left);
+    
+    if (array_length(night_events) == 0) {
+        draw_text(_bx + 30, _by + 80, "Không có sự kiện gì đặc biệt xảy ra.");
+    } else {
+        for (var k = 0; k < array_length(night_events); k++) {
+            draw_text(_bx + 30, _by + 80 + (k * 40), night_events[k]);
+        }
+    }
+    
+    // Nút X để đóng
+    draw_set_color(c_red);
+    draw_rectangle(_bx + _bw - 40, _by + 10, _bx + _bw - 10, _by + 40, false);
+    draw_set_color(c_white); draw_set_halign(fa_center); draw_set_valign(fa_middle);
+    draw_text(_bx + _bw - 25, _by + 25, "X");
+    draw_set_halign(fa_left); draw_set_valign(fa_top);
+}
+
+// VẼ CON TRỎ CHUỘT CUSTOM (To hơn 30%)
+if (room != rm_menu && room != rm_load_game) {
+    draw_sprite_ext(spr_mouse, 0, device_mouse_x_to_gui(0), device_mouse_y_to_gui(0), 1.3, 1.3, 0, c_white, 1);
 }

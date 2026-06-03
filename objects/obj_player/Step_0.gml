@@ -1,3 +1,5 @@
+if (room != rm_farm && room != rm_house) exit;
+
 // ĐẶC QUYỀN ADMIN
 if (global.player_name == "Admin_farm") {
     coins = 9999999;
@@ -187,23 +189,8 @@ if (obj_game_manager.show_shop == true && obj_game_manager.is_paused == false) {
                     if (_item_id == 2 || _item_id == 3) _buy_count = 5; 
                     
                     if (coins >= _price) {
-                        var _found_slot = -1;
-                        var _empty_slot = -1;
-                        
-                        for(var k = 0; k < 10; k++) {
-                            if (inventory[k] == _item_id) { _found_slot = k; break; }
-                            if (inventory[k] == -1 && _empty_slot == -1) { _empty_slot = k; }
-                        }
-                        
-                        if (_found_slot != -1) {
+                        if (add_item(_item_id, _buy_count)) {
                             coins -= _price;
-                            inventory_count[_found_slot] += _buy_count; 
-                            obj_game_manager.daily_shop[i] = -1; 
-                            audio_play_sound(snd_coin, 1, false); // PHÁT ÂM THANH MUA HÀNG
-                        } else if (_empty_slot != -1) {
-                            coins -= _price;
-                            inventory[_empty_slot] = _item_id;
-                            inventory_count[_empty_slot] = _buy_count; 
                             obj_game_manager.daily_shop[i] = -1; 
                             audio_play_sound(snd_coin, 1, false); // PHÁT ÂM THANH MUA HÀNG
                         }
@@ -260,7 +247,7 @@ if (_current_item == 0) { // Cuốc
 } else if (_current_item == 5) { // Thuốc sinh học
     if (_target_dirt != noone && _target_dirt.is_infected == true) is_action_valid = true;
 } else if (_current_item == 2) { // Liềm
-    if (_target_dirt != noone && (_target_dirt.has_weed == true || _target_dirt.plant_stage == 5)) is_action_valid = true;
+    if (_target_dirt != noone && (_target_dirt.has_weed == true || _target_dirt.plant_stage == 4)) is_action_valid = true;
 } else if (_current_item == 3) { // Xẻng
     if (_target_dirt != noone && _target_dirt.plant_stage > 0) is_action_valid = true;
 }
@@ -269,7 +256,7 @@ if (_current_item == 0) { // Cuốc
 if (_target_npc != noone || _target_bed != noone || _target_bin != noone || _target_table != noone || _target_shop != noone || _target_deco != noone) {
     is_action_valid = true;
 }
-if (_target_dirt != noone && _target_dirt.plant_stage == 4) { // Thu hoạch nông sản
+if (_target_dirt != noone && _target_dirt.plant_stage == 3) { // Thu hoạch nông sản
     is_action_valid = true;
 }
 
@@ -383,7 +370,7 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
         if (_target_dirt != noone) {
             
             // THU HOẠCH NÔNG SẢN
-            if (_target_dirt.plant_stage == 4) {
+            if (_target_dirt.plant_stage == 3) {
                 action_timer = 15;
                 hunger -= 1;
                 if (hunger < 0) hunger = 0;
@@ -398,19 +385,7 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
                     _yield = 2; effect_create_above(ef_star, _target_dirt.x + 32, _target_dirt.y + 32, 0, c_green);
                 }
                 
-                var _found_slot = -1;
-                var _empty_slot = -1;
-                for(var k = 0; k < 10; k++) {
-                    if (inventory[k] == _crop_id) { _found_slot = k; break; }
-                    if (inventory[k] == -1 && _empty_slot == -1) { _empty_slot = k; }
-                }
-                
-                if (_found_slot != -1) {
-                    inventory_count[_found_slot] += _yield;
-                } else if (_empty_slot != -1) {
-                    inventory[_empty_slot] = _crop_id;
-                    inventory_count[_empty_slot] = _yield;
-                }
+                add_item(_crop_id, _yield);
                 
                 _target_dirt.plant_stage = 0; 
                 _target_dirt.is_fertilized = false; 
@@ -435,8 +410,8 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
                 else if (_current_item >= 9 && _current_item <= 17) { // Hạt giống
                     _target_dirt.plant_stage = 1; 
                     _target_dirt.plant_type = _current_item; 
-                    if (_current_item == 9 || _current_item == 12 || _current_item == 14) _target_dirt.growth_max = 1200; // 3 stages * 1200 = 3600
-                    else _target_dirt.growth_max = 2400; // 3 stages * 2400 = 7200
+                    if (_current_item == 9 || _current_item == 12 || _current_item == 14) _target_dirt.growth_max = 1800; // 2 stages * 1800 = 3600
+                    else _target_dirt.growth_max = 3600; // 2 stages * 3600 = 7200
                     
                     inventory_count[selected_slot] -= 1;
                     if (inventory_count[selected_slot] <= 0) inventory[selected_slot] = -1; 
@@ -455,9 +430,9 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
                     effect_create_above(ef_smoke, _target_dirt.x + 32, _target_dirt.y + 32, 1, c_lime);
                 }
                 else if (_current_item == 2) { // Liềm
-                    if (_target_dirt.has_weed == true || _target_dirt.plant_stage == 5) {
+                    if (_target_dirt.has_weed == true || _target_dirt.plant_stage == 4) {
                         _target_dirt.has_weed = false;
-                        if (_target_dirt.plant_stage == 5) {
+                        if (_target_dirt.plant_stage == 4) {
                             _target_dirt.plant_stage = 0;
                             _target_dirt.is_fertilized = false;
                             _target_dirt.is_infected = false;
@@ -499,19 +474,7 @@ if ((keyboard_check_pressed(vk_space) || (mouse_check_button_pressed(mb_left) &&
             action_timer = 15;
             hunger -= 1; 
             if (hunger < 0) hunger = 0;
-            var _found_slot = -1;
-            var _empty_slot = -1;
-            for(var k = 0; k < 10; k++) {
-                if (inventory[k] == _target_deco.item_id) { _found_slot = k; break; }
-                if (inventory[k] == -1 && _empty_slot == -1) { _empty_slot = k; }
-            }
-            
-            if (_found_slot != -1) {
-                inventory_count[_found_slot] += 1;
-                instance_destroy(_target_deco);
-            } else if (_empty_slot != -1) {
-                inventory[_empty_slot] = _target_deco.item_id;
-                inventory_count[_empty_slot] = 1;
+            if (add_item(_target_deco.item_id, 1)) {
                 instance_destroy(_target_deco);
             }
         }

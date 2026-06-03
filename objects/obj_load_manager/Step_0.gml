@@ -41,7 +41,7 @@ if (mouse_check_button_pressed(mb_left)) {
         // 1. KIỂM TRA CLICK VÀO NÚT XÓA (MÀU ĐỎ)
         if (slot_names[i] != "Trống") {
             if (i != 3) {
-                if (_mx > _start_x + 500 && _mx < _start_x + 580 && _my > _btn_y + 25 && _my < _btn_y + 75) {
+                if (_mx > _start_x + 480 && _mx < _start_x + 580 && _my > _btn_y + 25 && _my < _btn_y + 75) {
                     if (file_exists(slot_files[i])) file_delete(slot_files[i]); // Xóa file trong ổ cứng
                     slot_names[i] = "Trống"; // Reset giao diện
                     slot_days[i] = 0;
@@ -75,7 +75,7 @@ if (mouse_check_button_pressed(mb_left)) {
     }
     
     // 3. KIỂM TRA CLICK NÚT TRỞ VỀ MENU
-    if (_mx > 20 && _mx < 150 && _my > 20 && _my < 70) {
+    if (_mx > 30 && _mx < 180 && _my > 30 && _my < 80) {
         room_goto(rm_menu);
     }
 }

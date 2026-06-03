@@ -23,7 +23,7 @@ if (has_weed == true) {
 }
 
 // 2. VẼ CÂY (NẾU CÂY CHẾT SẼ BỊ NHUỘM MÀU XÁM TRO)
-if (plant_stage >= 1 && plant_stage <= 5) {
+if (plant_stage >= 1 && plant_stage <= 4) {
     var _spr = -1;
     var _sprites = [];
     
@@ -40,8 +40,7 @@ if (plant_stage >= 1 && plant_stage <= 5) {
     if (array_length(_sprites) == 4) {
         if (plant_stage == 1) _spr = _sprites[0];
         else if (plant_stage == 2) _spr = _sprites[1];
-        else if (plant_stage == 3) _spr = _sprites[2];
-        else if (plant_stage >= 4) _spr = _sprites[3]; // Giai đoạn quả chín, hoặc héo
+        else if (plant_stage >= 3) _spr = _sprites[2]; // Giai đoạn trưởng thành hoặc héo
     }
     
     if (_spr != -1) {
@@ -50,7 +49,7 @@ if (plant_stage >= 1 && plant_stage <= 5) {
         var _max_dim = max(_sw, _sh);
         
         // Đặt kích thước riêng cho từng giai đoạn tránh bị lỗi to nhỏ
-        var _target_dim = 52.0; // Kích thước bình thường (Giai đoạn 3, 4, 5)
+        var _target_dim = 52.0; // Kích thước bình thường (Giai đoạn 3, 4)
         if (plant_stage == 1) {
             _target_dim = 24.0; // Hạt giống thì nhỏ gọn
         } else if (plant_stage == 2) {
@@ -66,12 +65,12 @@ if (plant_stage >= 1 && plant_stage <= 5) {
         var _tl_y = y + (64 - _draw_h) / 2;
         
         var _col = c_white;
-        if (plant_stage == 5) _col = c_gray; // Héo úa
+        if (plant_stage == 4) _col = c_gray; // Héo úa
         
         // Dùng stretched_ext để phớt lờ origin gốc, ép vẽ chính xác vào khung đã tính
         draw_sprite_stretched_ext(_spr, 0, _tl_x, _tl_y, _draw_w, _draw_h, _col, 1);
         
-        if (plant_stage == 5) {
+        if (plant_stage == 4) {
             draw_set_color(c_ltgray); draw_set_halign(fa_center);
             draw_text_transformed(x + 32, _tl_y - 15, "HÉO CHẾT", 0.7, 0.7, 0);
             draw_set_halign(fa_left);
@@ -80,13 +79,13 @@ if (plant_stage >= 1 && plant_stage <= 5) {
 }
 
 // 3. VẼ SÂU BỆNH
-if (is_infected == true && plant_stage != 5) draw_sprite(spr_bug, 0, x + 32, y + 10);
+if (is_infected == true && plant_stage != 4) draw_sprite(spr_bug, 0, x + 32, y + 10);
 
 // ========================================================
 // 4. VẼ THANH TIẾN ĐỘ THỜI GIAN (UI TRỰC QUAN TRÊN ĐẦU CÂY)
 // ========================================================
 
-if (plant_stage >= 1 && plant_stage <= 3) {
+if (plant_stage >= 1 && plant_stage <= 2) {
     var _px = x + 32; 
     var _py = y - 10;
     

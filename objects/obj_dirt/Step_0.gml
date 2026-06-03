@@ -1,6 +1,6 @@
 if (plant_stage > 0) {
     // 1. GIAI ĐOẠN ĐANG LỚN (Giai đoạn 1 và 2)
-    if (plant_stage < 4) {
+    if (plant_stage < 3) {
         var _req_season = 0;
         if (plant_type >= 9 && plant_type <= 12) _req_season = 0;
         else if (plant_type >= 13 && plant_type <= 14) _req_season = 1;
@@ -18,7 +18,7 @@ if (plant_stage > 0) {
             // Đủ thời gian -> Cây lớn lên 1 cấp
             if (growth_timer >= growth_max) {
                 plant_stage += 1;
-                if (plant_stage == 4 && has_weed == true) {
+                if (plant_stage == 3 && has_weed == true) {
                     is_neglected = true; // Bị hạ hạng vì có cỏ dại lúc ra quả
                 }
                 growth_timer = 0; // Reset lại đồng hồ lớn
@@ -34,7 +34,7 @@ if (plant_stage > 0) {
             is_neglected = true;
             rot_timer += 1;
             if (rot_timer >= 3600) {
-                plant_stage = 5; // Quá 12 tiếng không cứu -> Cây chết
+                plant_stage = 4; // Quá 12 tiếng không cứu -> Cây chết
             }
         }
     }

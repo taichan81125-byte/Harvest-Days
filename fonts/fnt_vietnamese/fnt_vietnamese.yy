@@ -1,4 +1,4 @@
-﻿{
+{
   "$GMFont":"",
   "%Name":"fnt_vietnamese",
   "AntiAlias":1,
@@ -9,7 +9,7 @@
   "canGenerateBitmap":true,
   "charset":0,
   "first":0,
-  "fontName":"Arial",
+  "fontName":"Keratine",
   "glyphOperations":0,
   "glyphs":{
     "32":{"character":32,"h":23,"offset":0,"shift":5,"w":5,"x":2,"y":2,},
@@ -369,7 +369,7 @@
     {"lower":7840,"upper":7929,},
     {"lower":9647,"upper":9647,},
   ],
-  "regenerateBitmap":false,
+  "regenerateBitmap":true,
   "resourceType":"GMFont",
   "resourceVersion":"2.0",
   "sampleText":"abcdef ABCDEF\n0123456789 .,<>\"'&!?\nthe quick brown fox jumps over the lazy dog\nTHE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\nDefault character: ▯ (9647)",

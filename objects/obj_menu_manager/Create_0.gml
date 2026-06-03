@@ -1,6 +1,8 @@
 // Đổi con trỏ chuột sang sprite mới và ẩn con trỏ chuột hệ thống ngay từ lúc mở game
-cursor_sprite = spr_mouse;
+// Xóa cursor_sprite để vẽ thủ công to hơn
 window_set_cursor(cr_none);
+
+display_set_gui_size(1280, 720);
 
 // Biến dùng để tạo hiệu ứng nhấp nháy (độ mờ) cho dòng chữ "Nhấn Space"
 text_alpha = 1.0;

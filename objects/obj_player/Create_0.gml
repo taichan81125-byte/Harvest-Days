@@ -23,6 +23,34 @@ inventory = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
 // Mảng 10 ô chứa SỐ LƯỢNG vật phẩm tương ứng
 inventory_count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+// Kho đồ cá nhân 20 ô (2 hàng)
+bag = array_create(20, -1);
+bag_count = array_create(20, 0);
+
+// Hàm thêm vật phẩm vào kho (Ưu tiên stack hotbar -> stack bag -> ô trống hotbar -> ô trống bag)
+add_item = function(_id, _amt) {
+    var _added = false;
+    for(var k = 0; k < 10; k++) {
+        if (inventory[k] == _id) { inventory_count[k] += _amt; _added = true; break; }
+    }
+    if (!_added) {
+        for(var k = 0; k < 20; k++) {
+            if (bag[k] == _id) { bag_count[k] += _amt; _added = true; break; }
+        }
+    }
+    if (!_added) {
+        for(var k = 0; k < 10; k++) {
+            if (inventory[k] == -1) { inventory[k] = _id; inventory_count[k] = _amt; _added = true; break; }
+        }
+    }
+    if (!_added) {
+        for(var k = 0; k < 20; k++) {
+            if (bag[k] == -1) { bag[k] = _id; bag_count[k] = _amt; _added = true; break; }
+        }
+    }
+    return _added;
+};
+
 // --- HỆ THỐNG SINH TỒN ---
 hunger = 100;       // Thanh thức ăn (Tối đa 100)
 hp = 3;             // ĐÃ ĐỔI TỪ HEALTH THÀNH HP (Máu - Tối đa 3 trái tim)

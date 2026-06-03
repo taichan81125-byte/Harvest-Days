@@ -1,3 +1,5 @@
+if (room != rm_farm && room != rm_house) exit;
+
 // 1. LẤY THÔNG TIN VẬT PHẨM ĐANG CẦM
 var _current_item = -1;
 if (selected_slot != -1) _current_item = inventory[selected_slot];
