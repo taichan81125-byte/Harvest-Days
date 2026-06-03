@@ -1,4 +1,4 @@
-﻿{
+{
   "$GMSound":"v2",
   "%Name":"snd_bgm",
   "audioGroupId":{

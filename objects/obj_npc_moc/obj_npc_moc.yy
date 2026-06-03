@@ -1,4 +1,4 @@
-﻿{
+{
   "$GMObject":"",
   "%Name":"obj_npc_moc",
   "eventList":[],

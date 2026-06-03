@@ -7,7 +7,7 @@
   "overriddenProperties":[],
   "parent":{
     "name":"Environment",
-    "path":"folders/Objects/Environment.yy"
+    "path":"folders/Objects/Environment.yy",
   },
   "parentObjectId":null,
   "persistent":false,
@@ -29,8 +29,8 @@
   "solid":false,
   "spriteId":{
     "name":"spr_solid",
-    "path":"sprites/spr_solid/spr_solid.yy"
+    "path":"sprites/spr_solid/spr_solid.yy",
   },
   "spriteMaskId":null,
-  "visible":false
+  "visible":false,
 }

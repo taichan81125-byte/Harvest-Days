@@ -1,3 +1,6 @@
+draw_set_alpha(1.0);
+draw_set_color(c_white);
+
 // 1. VẼ ĐẤT VÀ PHÂN BÓN (ÉP KÍCH THƯỚC CHUẨN 64x64 TRÁNH LỖI ẢNH TO)
 var _dirt_spr = -1;
 if (state == 0) _dirt_spr = spr_dirt_dry;

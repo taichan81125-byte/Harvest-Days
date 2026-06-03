@@ -1,4 +1,4 @@
-﻿{
+{
   "$GMRoom":"v1",
   "%Name":"rm_menu",
   "creationCodeFile":"",

@@ -271,7 +271,7 @@ else if (is_paused == true && show_settings == false && show_inventory == false 
         is_paused = false;
         show_settings = false;
         show_inventory = false;
-        room_goto(rm_menu); 
+        game_restart(); 
     }
 }
 

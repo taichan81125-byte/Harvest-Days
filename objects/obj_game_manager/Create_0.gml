@@ -4,6 +4,9 @@ if (instance_number(obj_game_manager) > 1) {
     exit;
 }
 
+// Đặt depth = 199 để vẽ background đè lên lớp Background (200) nhưng nằm DƯỚI obj_dirt (99) và obj_player (<0)
+depth = 199;
+
 // Đổi con trỏ chuột sang sprite mới và ẩn con trỏ chuột hệ thống
 // Xóa cursor_sprite để vẽ thủ công to hơn
 window_set_cursor(cr_none);
