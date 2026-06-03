@@ -45,7 +45,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.4.222",
+    "IDEVersion":"2024.14.3.217",
   },
   "name":"HarvestDays",
   "resources":[
@@ -142,6 +142,7 @@
     {"id":{"name":"spr_mat_dong_ho","path":"sprites/spr_mat_dong_ho/spr_mat_dong_ho.yy",},},
     {"id":{"name":"spr_mouse","path":"sprites/spr_mouse/spr_mouse.yy",},},
     {"id":{"name":"spr_nen_game","path":"sprites/spr_nen_game/spr_nen_game.yy",},},
+    {"id":{"name":"spr_nen_shop","path":"sprites/spr_nen_shop/spr_nen_shop.yy",},},
     {"id":{"name":"spr_nho","path":"sprites/spr_nho/spr_nho.yy",},},
     {"id":{"name":"spr_npc_moc","path":"sprites/spr_npc_moc/spr_npc_moc.yy",},},
     {"id":{"name":"spr_plant_mature","path":"sprites/spr_plant_mature/spr_plant_mature.yy",},},
